@@ -16,3 +16,13 @@ initial goals :
 ---
 
 note : always run the website in private window or incognito mode. 
+
+---
+
+## Steps to run :
+
+- create a new virtual env
+- install everything from  `requirements.txt`
+- run django server :
+
+`python manage.py runserver`
