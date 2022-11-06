@@ -18,9 +18,9 @@
     <div class="container-fluid">
         <div class="row">
           <div class="col-sm-2">
-            <ul class="sidebar-nav"> 
+            <ul> 
               <li><a href="{% url 'daku:daku-home' %}">Home Page</a></li>
-              <ul class="sidebar-nav">
+              <ul>
                 {% if user.is_authenticated %}
                   <li><strong>User: </strong>{{ user.get_username }}</li>
                   <li><a href="{% url 'account:logout' %}?next={{ request.path }}">Logout</a></li>
