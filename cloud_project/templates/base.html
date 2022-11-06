@@ -23,10 +23,10 @@
               <ul class="sidebar-nav">
                 {% if user.is_authenticated %}
                   <li><strong>User: </strong>{{ user.get_username }}</li>
-                  <li><a href="{% url 'account:account-logout' %}?next={{ request.path }}">Logout</a></li>
-                  <li><a href="{% url 'account:account-dashboard' %}">My Profile</a></li>
+                  <li><a href="{% url 'account:logout' %}?next={{ request.path }}">Logout</a></li>
+                  <li><a href="{% url 'account:dashboard' %}">My Profile</a></li>
                 {% else %}
-                  <li><a href="{% url 'account:account-login' %}?next={{ request.path }}">Login</a></li>
+                  <li><a href="{% url 'account:login' %}?next={{ request.path }}">Login</a></li>
                 {% endif %}
               </ul>
             </ul>
