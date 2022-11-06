@@ -8,15 +8,18 @@ from django.utils.encoding import force_bytes, force_str
 from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
 
 from .models import UserBase
+from daku.models import Container
+import docker
 from .tokens import account_activation_token
 from .forms import RegistrationForm
-
+from daku.models import Container
 
 @login_required
 def dashboard(request):
+    containers = Container.objects.filter(user=request.user)
     return render(request,
                   'account/user/dashboard.html',
-                  {'section': 'profile'})
+                  {'containers': containers})
 
 def account_register(request):
 
@@ -39,7 +42,15 @@ def account_register(request):
                 'uid': urlsafe_base64_encode(force_bytes(user.pk)),
                 'token': account_activation_token.make_token(user),
             })
+
             user.email_user(subject=subject, message=message)
+
+            client = docker.from_env()
+            container = client.containers.run("bfirsh/reticulate-splines", detach=True)
+
+            c = Container(user=user, container_id = container.id)
+            c.save()
+
             return HttpResponse('registered succesfully and activation sent')
     else:
         registerForm = RegistrationForm()
