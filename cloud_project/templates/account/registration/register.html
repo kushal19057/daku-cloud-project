@@ -1,0 +1,17 @@
+{% extends "../sub_base.html" %}
+
+{% block subcontent %}
+
+<form action="." method="post">
+    {% csrf_token %}
+    <fieldset class="form-group">
+        {{ form }}
+        <button class="btn btn-primary" type="submit">Register</button>
+    </fieldset>
+</form>
+
+<p class="text-center">
+    <a href="{% url 'account:account-login' %}">Already have an account ?</a>
+</p>
+
+{% endblock %}

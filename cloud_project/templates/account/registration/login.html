@@ -1,6 +1,6 @@
-{% extends "base_generic.html" %}
+{% extends "../sub_base.html" %}
 
-{% block content %}
+{% block sub_content %}
 
   {% if form.errors %}
     <p>Your username and password didn't match. Please try again.</p>
@@ -15,7 +15,7 @@
     {% endif %}
   {% endif %}
 
-  <form method="post" action="{% url 'login' %}">
+  <form method="post" action="{% url 'account:account-login' %}">
     {% csrf_token %}
     <table>
       <tr>
@@ -31,7 +31,6 @@
     <input type="hidden" name="next" value="{{ next }}">
   </form>
 
-  {# Assumes you setup the password_reset view in your URLconf #}
-  <p><a href="{% url 'password_reset' %}">Lost password?</a></p>
+  <div class="text-center">Don't have an account ? <a href="{% url 'account:account-register' %}">Sign Up Now</a></div>
 
 {% endblock %}

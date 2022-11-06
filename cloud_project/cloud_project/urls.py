@@ -20,13 +20,16 @@ from django.views.generic import RedirectView
 from django.conf import settings
 from django.conf.urls.static import static
 
+from django.contrib.auth import views as auth_views
+from django.contrib.auth.views import LoginView
+
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('daku/', include('daku.urls')),
+    path('daku/', include('daku.urls', namespace='daku')),
     path('', RedirectView.as_view(url='daku/')),
-    path('accounts/', include('django.contrib.auth.urls')),
+    path('account/', include('account.urls', namespace='account')),
 ]
 
-urlpatterns += static(settings.STATIC_URL, 
-document_root = settings.STATIC_ROOT)
+if settings.DEBUG:
+    urlpatterns += static(settings.STATIC_URL, document_root = settings.STATIC_ROOT)
 
