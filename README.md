@@ -12,3 +12,7 @@ initial goals :
 - [ ] ability to `upload files` and `view` or `delete` uploaded files
   - [ ] see FCS repo
 - [ ] ability to `run` files and stream outputs using any script (beast ?)
+
+---
+
+note : always run the website in private window or incognito mode. 
