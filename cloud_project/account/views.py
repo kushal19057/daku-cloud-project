@@ -9,24 +9,14 @@ from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
 
 from .models import UserBase
 from .tokens import account_activation_token
+from .forms import RegistrationForm
 
 
 @login_required
 def dashboard(request):
-    orders = []
     return render(request,
                   'account/user/dashboard.html',
-                  {'section': 'profile', 'orders': orders})
-
-
-@login_required
-def delete_user(request):
-    user = UserBase.objects.get(user_name=request.user)
-    user.is_active = False
-    user.save()
-    logout(request)
-    return redirect('account:delete_confirmation')
-
+                  {'section': 'profile'})
 
 def account_register(request):
 

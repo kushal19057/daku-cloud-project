@@ -1,7 +1,6 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 
 # Create your views here.
 
 def home(request):
-    """View function for home page of site"""
     return render(request, 'daku/home.html')

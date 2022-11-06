@@ -1,4 +1,4 @@
-{% extends "../sub_base.html" %}
+{% extends "../../base.html" %}
 {% block title %}Log-in{% endblock %}
 {% block content %}
 
@@ -48,16 +48,9 @@
                                     </button>
                                 </div>
                                 <p class="text-center pb-3">
-                                    <a href="{% url "account:register" %}">Create an account</a>
+                                    <a href="{% url 'account:register' %}">Create an account</a>
                                 </p>
                             </form>
-                            <p class="small text-center pt-4">
-                                {% comment %} <a href="{% url "password_reset" %}">Forgotten Password?</a> {% endcomment %}
-                            </p>
-                            <p class="small text-center">
-                                {% comment %} <a href="{% url "accounts:register" %}">Help Center?</a> {% endcomment %}
-                            </p>
-                     
                         </div>
                     </div>
                 </div>
