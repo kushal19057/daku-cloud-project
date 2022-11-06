@@ -1,0 +1,23 @@
+{% extends "../../base.html" %} 
+
+{% load static %} 
+
+{% block content %}
+
+<main class="pt-5">
+  <div class="container" style="max-width: 1000px">
+    <div class="col-12">
+      <h1>My Dashboard</h1>
+      <p><strong>Email : </strong> {{user.email}}</p>
+      <p><strong>Last login : </strong> {{user.last_login}}</p>
+      <p><strong>My containers currently running : </strong></p>
+      {% for container in containers %}
+        <p>{{container.container_id}}/p>
+      {% endfor %}
+    </div>
+
+  </div>
+</main>
+
+
+{% endblock %}
