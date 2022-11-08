@@ -14,6 +14,9 @@ from .tokens import account_activation_token
 from .forms import RegistrationForm
 from daku.models import Container
 
+import subprocess
+import shlex
+
 @login_required
 def dashboard(request):
     containers = Container.objects.filter(user=request.user)
@@ -46,7 +49,10 @@ def account_register(request):
             user.email_user(subject=subject, message=message)
 
             client = docker.from_env()
-            container = client.containers.run("bfirsh/reticulate-splines", detach=True)
+            container = client.containers.run("my-go-app", ports={8080:None}, detach=True)
+            container.reload()
+            print(container.ports)
+            # subprocess.run(shlex.split("docker run -p 8080:8080 -it my-go-app"))
 
             c = Container(user=user, container_id = container.id)
             c.save()

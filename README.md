@@ -26,3 +26,28 @@ note : always run the website in private window or incognito mode.
 - run django server :
 
 `python manage.py runserver`
+
+---
+Related to dockerizing go app and running that container from python and interacting with it from postman.
+
+Some important links (kushal) :
+
+
+- https://stackoverflow.com/questions/69720234/retrieve-the-host-port-of-a-container-launched-from-docker-sdk-for-python
+- https://realpython.com/python-subprocess/#basic-usage-of-the-python-subprocess-module
+- https://stackoverflow.com/questions/32451748/how-to-bind-ports-with-docker-py
+- https://tutorialedge.net/golang/go-docker-tutorial/
+- https://stackoverflow.com/questions/39037049/how-to-upload-a-file-and-json-data-in-postman
+- https://gabrieltanner.org/blog/golang-file-uploading/
+- https://github.com/zupzup/golang-http-file-upload-download/blob/main/main.go
+- https://www.zupzup.org/go-http-file-upload-download/
+- https://freshman.tech/file-upload-golang/
+
+```
+history | grep docker
+docker build -t my-go-app .
+docker images
+docker run -p 8080:8081 -it my-go-app
+docker ps
+docker stop <container id>
+```
