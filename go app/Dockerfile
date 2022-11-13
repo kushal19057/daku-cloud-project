@@ -14,6 +14,14 @@ WORKDIR /app
 ## executable of our Go program
 RUN go mod init main.go
 RUN go build -o main .
+RUN apt-get update -y
+RUN apt-get upgrade -y
+RUN apt-get install unzip -y
+RUN wget -c https://github.com/GauravDawra/Beast/releases/download/v1.1.0/beast-linux-64bit.zip
+RUN unzip beast-linux-64bit.zip
+RUN chmod +x beast
+RUN mv beast /usr/local/bin/beast
+
 ## Our start command which kicks off
 ## our newly created binary executable
 CMD ["/app/main"]

@@ -26,6 +26,7 @@
                   <li><a href="{% url 'account:logout' %}">Logout</a></li>
                   <li><a href="{% url 'account:dashboard' %}">My Profile</a></li>
                   <li><a href="{% url 'daku:daku-file-upload'%}">Upload File</a></li>
+                  <li><a href="{% url 'daku:daku-beast'%}">Upload Beast File</a></li>
                 {% else %}
                   <li><a href="{% url 'account:login' %}">Login</a></li>
                 {% endif %}

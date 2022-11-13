@@ -1,9 +1,10 @@
 from django.urls import path
-from .views import daku_home, daku_file_upload
+from .views import daku_home, daku_file_upload, daku_beast
 
 app_name = "daku"
 
 urlpatterns = [
     path('', daku_home, name='daku-home'),
-    path('upload/', daku_file_upload, name='daku-file-upload')
+    path('upload/', daku_file_upload, name='daku-file-upload'),
+    path('run/', daku_beast, name='daku-beast')
 ]

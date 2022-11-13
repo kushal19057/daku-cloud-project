@@ -5,4 +5,5 @@ class FileUploadForm(forms.Form):
     filepath = forms.CharField(label="enter file path")
     file = forms.FileField()
 
-    
+class BeastUploadForm(forms.Form):
+    file = forms.FileField()
