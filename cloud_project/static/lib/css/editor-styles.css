@@ -1,0 +1,42 @@
+:root {
+    --editor-bg: #eee;
+    --editor-border: #3f87a6;
+    --console-bg: #000;
+    --console-text-color: #fff;
+}
+
+.editor__code {
+    min-height: 500px;
+    width: 100%%;    
+
+    border: 1px solid var(--editor-border);
+}
+
+.editor__btn {
+    border: 0;
+    padding: .5em;
+    background-color: #fff;
+    border: 2px solid #333;
+    margin-top: 1em;
+    cursor: pointer;
+}
+
+.editor__lang {
+    border: 0;
+    padding: .5em;
+    background-color: #fff;
+    border: 2px solid #333;
+    margin-top: 1em;
+    cursor: pointer;
+}
+
+.editor__console {
+    background-color: #fff;
+    width: 100%%;
+    min-height: 130px;
+    margin-top: 0.9em;
+    border: 1px solid var(--editor-border);
+    overflow: auto;
+    background-color: var(--console-bg);
+    color: var(--console-text-color);
+}
