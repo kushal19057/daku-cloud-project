@@ -33,14 +33,16 @@ def get_docker_url(user):
     client = docker.from_env()
     c = Container.objects.get(user=user)
 
-    if c is not None:
-        container_id = c.container_id
-        container = client.containers.get(container_id)
-        print(container.ports)
-        hostIp = container.ports['8080/tcp'][0]['HostIp']
-        hostPort = container.ports['8080/tcp'][0]['HostPort']
-        print(container.id + " connection established | status = " + container.status)
-        print(hostIp, hostPort)
+    # if c is not None:
+    #     container_id = c.container_id
+    #     container = client.containers.get(container_id)
+    #     print(container.ports)
+    #     hostIp = container.ports['8080/tcp'][0]['HostIp']
+    #     hostPort = container.ports['8080/tcp'][0]['HostPort']
+    #     print(container.id + " connection established | status = " + container.status)
+    #     print(hostIp, hostPort)
 
-        url = f"http://{hostIp}:{hostPort}/upload"
-        return url
+    #     url = f"http://{hostIp}:{hostPort}/upload"
+    #     return url
+    
+    return 'url'
