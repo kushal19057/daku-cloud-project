@@ -1,0 +1,50 @@
+{% load static %} 
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{% static 'lib/css/editor-styles.css' %}">
+    <title>Code Editor</title>
+</head>
+<body>
+
+    <div class="editor">
+        <div class="editor__wrapper">
+            <div class="editor__body">
+                <div id="editorCode" class="editor__code"></div>
+            </div>
+            <div class="editor__footer">
+                <div class="editor__footer--left">
+                    <button class="editor__btn editor__run">Run</button>
+                    <button class="editor__btn editor__reset">Reset</button>
+                    <select id="editorLang" class="editor__lang">
+                        <option value="None" selected>None</option>
+                        <option value="Python">Python</option>
+                        <option value="Java">Java</option>
+                        <option value="JavaScript">JavaScript</option>
+                        <option value="C++">C++</option>
+                    </select>
+                </div>
+                <div class="editor__footer--right">
+                    <div class="editor__console">
+                        <ul class="editor__console-logs"></ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Required Ace Libraries -->
+    <script src="{% static 'lib/ace-editor/src-min/ace.js' %}"></script>
+    <script src="{% static 'lib/ace-editor/src-min/mode-java.js' %}"></script>
+    <script src="{% static 'lib/ace-editor/src-min/mode-python.js' %}"></script>
+    <script src="{% static 'lib/ace-editor/src-min/mode-javascript.js' %}"></script>
+    <script src="{% static 'lib/ace-editor/src-min/mode-c_cpp.js' %}"></script>
+    <script src="{% static 'lib/ace-editor/src-min/ext-language_tools.js' %}"></script>
+
+    <!-- custom scripts -->
+    <script src="{% static 'lib/js/editor.js' %}"></script>
+</body>
+</html>

@@ -51,3 +51,15 @@ docker run -p 8080:8081 -it my-go-app
 docker ps
 docker stop <container id>
 ```
+
+---
+
+- [ ] able to run files inside go container. create simple demo app. see online editor code repo for example
+- [ ] show file structure and folders (search create dropbox clone using node js)
+- [ ] create files using online text editor and save files using that.
+- [ ] delete files, move files
+- [ ] upload folder
+- [ ] Improve UI
+- [ ] Run containers on college pc instead of laptop 
+- [ ] deploy on PC 1, containers on PC 2, 3
+- [ ] 

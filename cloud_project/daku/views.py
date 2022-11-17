@@ -31,3 +31,7 @@ def daku_beast(request):
     else:
         form = BeastUploadForm()
         return render(request, "daku/beast_upload.html", {'form': form})
+
+@login_required
+def daku_file_editor(request):
+    return render(request, "daku/create_file_using_editor.html")

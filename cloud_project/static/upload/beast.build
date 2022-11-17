@@ -1,0 +1,4 @@
+build A : t1.c
+	! g++ t1.c -o t1
+	! echo "t1.c has been build!!!"
+
