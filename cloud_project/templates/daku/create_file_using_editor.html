@@ -1,16 +1,13 @@
 {% extends '../base.html' %} {% block content %}
 
+<pre><b>beast.build</b>; Refer <a href="https://github.com/GauravDawra/Beast">here</a> for more details.</pre> 
+
+<p>{{ docker_details }}</p>
+
 <div id="editorCode" class="editor__code"></div>
 
 <button class="editor__btn editor__run">Run</button>
 <button class="editor__btn editor__reset">Reset</button>
-<select id="editorLang" class="editor__lang">
-    <option value="None" selected>None</option>
-    <option value="Python">Python</option>
-    <option value="Java">Java</option>
-    <option value="JavaScript">JavaScript</option>
-    <option value="C++">C++</option>
-</select>
 
 <div class="editor__console">
     <ul class="editor__console-logs"></ul>

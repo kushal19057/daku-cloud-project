@@ -29,12 +29,7 @@ def handle_uploaded_file(f, user):
             print(r)
 
 
-def handle_beast_file(f, user):
-
-    with open("./static/upload/" + f.name, 'wb') as destination:
-        for chunk in f.chunks():
-            destination.write(chunk)
-
+def get_docker_url(user):
     client = docker.from_env()
     c = Container.objects.get(user=user)
 
@@ -46,9 +41,6 @@ def handle_beast_file(f, user):
         hostPort = container.ports['8080/tcp'][0]['HostPort']
         print(container.id + " connection established | status = " + container.status)
         print(hostIp, hostPort)
-        
-        with open("./static/upload/" + f.name, 'rb') as uf:
-            r = requests.post(f"http://{hostIp}:{hostPort}/upload", files={'uploadFile': uf})
-            print(r)
-            for out in container.exec_run("bash /app/tmp/beast", stream=True, detach=True, tty=True):
-                print(out)
+
+        url = f"http://{hostIp}:{hostPort}/upload"
+        return url

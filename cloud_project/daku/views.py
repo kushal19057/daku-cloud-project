@@ -1,10 +1,10 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
-from .forms import FileUploadForm, BeastUploadForm
+from .forms import FileUploadForm
 from django.http import HttpResponse
-from .functions import handle_uploaded_file, handle_beast_file
+from .functions import handle_uploaded_file
+from .functions import get_docker_url
 
-# Create your views here.
 
 @login_required
 def daku_home(request):
@@ -22,16 +22,5 @@ def daku_file_upload(request):
         return render(request, "daku/file_upload.html", {'form': form})
 
 @login_required
-def daku_beast(request):
-    if request.method == "POST":
-        form = BeastUploadForm(request.POST, request.FILES)
-        if form.is_valid():
-            handle_beast_file(request.FILES["file"], request.user)
-            return HttpResponse("File Uploaded and sent to run")
-    else:
-        form = BeastUploadForm()
-        return render(request, "daku/beast_upload.html", {'form': form})
-
-@login_required
 def daku_file_editor(request):
-    return render(request, "daku/create_file_using_editor.html")
+    return render(request, "daku/create_file_using_editor.html", {'docker_details': get_docker_url(request.user)})
