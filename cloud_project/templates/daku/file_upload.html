@@ -1,10 +1,46 @@
 {% extends '../base.html' %}
 
 {% block content %}
-<form method="POST" enctype="multipart/form-data">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">Submit</button>
-</form>
+
+<div class="container">
+    <h1>Upload files to Server</h1>
+    <p>Directly upload files to the container using this dialog box</p>
+    <p>{{ docker_details }}</p>
+
+    <input id="fileupload" type="file"/>
+    <button onclick="uploadFile()">Upload File</button>
+
+    <div id="uploadfilelogs"></div>
+
+    <script type="text/javascript">
+        // TODO transfer this JS code to static folder
+
+        // let url = "{{ docker_details }}" + "/upload_file"
+        let url = "http://localhost:8080/upload_file"
+
+        console.log(url);
+
+        async function postData(url, data) {
+            
+            const response = await fetch(url, data);
+            return response.json();
+        }
+
+        async function uploadFile() {
+            let formData = new FormData();
+            formData.append("upload_file", fileupload.files[0]);
+            data = {
+                method: "POST", 
+                body: formData
+            }
+
+            postData(url, data)
+            .then((resp) => {
+                document.getElementById("uploadfilelogs").innerHTML += "file saved at: " + resp.message;
+                console.log(resp);
+            })
+        }
+    </script>
+</div>
 
 {% endblock %}

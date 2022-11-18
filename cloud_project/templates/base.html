@@ -23,8 +23,9 @@
 
 
           {% if user.is_authenticated %}
-          <li><strong>User: </strong>{{ user.user_name }}</li>
           <div class="p-4"></div>
+          <li><strong>User: </strong>{{ user.user_name }}</li>
+          <div class="p-2"></div>
           <li><a href="{% url 'account:dashboard' %}">My Profile</a></li>
           <li><a href="{% url 'daku:daku-home' %}">Home Page</a></li>
           <li><a href="{% url 'daku:daku-file-upload'%}">Upload File</a></li>

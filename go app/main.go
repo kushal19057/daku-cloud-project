@@ -1,8 +1,7 @@
 package main
 
 import (
-	"crypto/rand"
-	"fmt"
+	"encoding/json"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -11,167 +10,159 @@ import (
 )
 
 // refer: https://github.com/zupzup/golang-http-file-upload-download/blob/main/main.go
-// NOTE : ensure that ./tmp directory already exists
+// NOTE : can also use gin-gonic or gorilla mux to do the job.
 
-const maxUploadSize = 1024 * 1024 // 1 mb
+// TODO : handle persist code (daku_mantra) before communicating with user
+
 const uploadPath = "./tmp/"
 
 func main() {
-
+	// NOTE : ensure that ./tmp directory already exists
 	newpath := filepath.Join(".", "tmp")
 	_ = os.MkdirAll(newpath, os.ModePerm)
 
-	http.HandleFunc("/upload", uploadFileHandler())
+	// 1. route to upload file to server
+	http.HandleFunc("/upload_file", uploadFileHandler())
 
+	// 2. route to download file from server
+	// fs := http.FileServer(http.Dir(uploadPath))
+	// http.Handle("/download_file/", http.StripPrefix("/files", fs))
+
+	// 3. route to build file and run stuff
 	http.HandleFunc("/run_beast", runBeastHandler())
-
-	fs := http.FileServer(http.Dir(uploadPath))
-	http.Handle("/files/", http.StripPrefix("/files", fs))
 
 	log.Fatal(http.ListenAndServe(":8080", nil))
 }
 
-func runBeastHandler() http.HandlerFunc {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		// note that the name of the file will be 'beast.build'
-		if r.Method == "GET" {
-			return
-		}
-
-		if err := r.ParseMultipartForm(maxUploadSize); err != nil {
-			renderError(w, "CANNOT PARSE FORM", http.StatusInternalServerError)
-			return
-		}
-
-		file, fileHeader, err := r.FormFile("uploadFile")
-		if err != nil {
-			renderError(w, "INVALID FILE", http.StatusBadRequest)
-			return
-		}
-
-		defer file.Close()
-
-		fileSize := fileHeader.Size
-		if fileSize > maxUploadSize {
-			renderError(w, "FILE TOO BIG", http.StatusBadRequest)
-			return
-		}
-
-		// fmt.Print(fileHeader.Filename)
-
-		fileBytes, err := ioutil.ReadAll(file)
-		if err != nil {
-			renderError(w, "INVALID FILE", http.StatusBadRequest)
-			return
-		}
-
-		// ignore file type right now
-
-		// fileName := randToken(12)
-		beastFileName := "beast.build"
-		newPath := filepath.Join(uploadPath, beastFileName)
-
-		// write file
-		newFile, err := os.Create(newPath)
-
-		if err != nil {
-			fmt.Print(newPath)
-			renderError(w, "CANNOT WRITE FILE", http.StatusInternalServerError)
-			return
-		}
-
-		defer newFile.Close()
-
-		if _, err := newFile.Write(fileBytes); err != nil || newFile.Close() != nil {
-			fmt.Print(newPath)
-			renderError(w, "CANNOT WRITE FILE", http.StatusInternalServerError)
-			return
-		}
-
-		ex, err := os.Executable()
-		if err != nil {
-			panic(err)
-		}
-		exPath := filepath.Dir(ex)
-		fmt.Println(exPath)
-
-		// output, err := exec.Command("/app/tmp/beast").Output()
-		// if err != nil {
-		// 	fmt.Print(output, err)
-		// 	renderError(w, fmt.Sprint(err), http.StatusInternalServerError)
-		// 	return
-		// }
-
-		w.Write([]byte("SUCCESSFUL BUILD"))
-	})
+func enableCors(w *http.ResponseWriter) {
+	(*w).Header().Set("Access-Control-Allow-Origin", "*")
 }
 
 func uploadFileHandler() http.HandlerFunc {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		enableCors(&w)
 		if r.Method == "GET" {
+			w.WriteHeader(http.StatusBadRequest)
+			w.Header().Set("Content-Type", "application/json")
+
+			resp := make(map[string]string)
+			resp["message"] = "The route does not accept GET requests. Try POST request."
+
+			jsonResp, err := json.Marshal(resp)
+			if err != nil {
+				log.Fatalf("Error happened in JSON marshal. Err: %s", err)
+			}
+
+			w.Write(jsonResp)
 			return
 		}
 
-		if err := r.ParseMultipartForm(maxUploadSize); err != nil {
-			renderError(w, "CANNOT PARSE FORM", http.StatusInternalServerError)
-			return
-		}
-
-		file, fileHeader, err := r.FormFile("uploadFile")
+		file, fileHeader, err := r.FormFile("upload_file")
 		if err != nil {
-			renderError(w, "INVALID FILE", http.StatusBadRequest)
+			w.WriteHeader(http.StatusBadRequest)
+			w.Header().Set("Content-Type", "application/json")
+
+			resp := make(map[string]string)
+			resp["message"] = "Invalid File"
+
+			jsonResp, err := json.Marshal(resp)
+			if err != nil {
+				log.Fatalf("Error happened in JSON marshal. Err: %s", err)
+			}
+
+			w.Write(jsonResp)
 			return
 		}
 
 		defer file.Close()
 
-		fileSize := fileHeader.Size
-		if fileSize > maxUploadSize {
-			renderError(w, "FILE TOO BIG", http.StatusBadRequest)
-			return
-		}
-
-		// fmt.Print(fileHeader.Filename)
-
 		fileBytes, err := ioutil.ReadAll(file)
 		if err != nil {
-			renderError(w, "INVALID FILE", http.StatusBadRequest)
+			w.WriteHeader(http.StatusInternalServerError)
+			w.Header().Set("Content-Type", "application/json")
+
+			resp := make(map[string]string)
+			resp["message"] = "File Cannot be read"
+
+			jsonResp, err := json.Marshal(resp)
+			if err != nil {
+				log.Fatalf("Error happened in JSON marshal. Err: %s", err)
+			}
+
+			w.Write(jsonResp)
 			return
 		}
 
-		// ignore file type right now
-
-		// fileName := randToken(12)
 		newPath := filepath.Join(uploadPath, fileHeader.Filename)
-		// newPath := fileHeader.Filename
+
 		// write file
 		newFile, err := os.Create(newPath)
 
 		if err != nil {
-			fmt.Print(newPath)
-			renderError(w, "CANNOT WRITE FILE", http.StatusInternalServerError)
+			w.WriteHeader(http.StatusInternalServerError)
+			w.Header().Set("Content-Type", "application/json")
+
+			resp := make(map[string]string)
+			resp["message"] = "Cannot write file to disk"
+
+			jsonResp, err := json.Marshal(resp)
+			if err != nil {
+				log.Fatalf("Error happened in JSON marshal. Err: %s", err)
+			}
+
+			w.Write(jsonResp)
 			return
 		}
 
 		defer newFile.Close()
 
 		if _, err := newFile.Write(fileBytes); err != nil || newFile.Close() != nil {
-			fmt.Print(newPath)
-			renderError(w, "CANNOT WRITE FILE", http.StatusInternalServerError)
+			w.WriteHeader(http.StatusInternalServerError)
+			w.Header().Set("Content-Type", "application/json")
+
+			resp := make(map[string]string)
+			resp["message"] = "Cannot write file to disk (2)"
+
+			jsonResp, err := json.Marshal(resp)
+			if err != nil {
+				log.Fatalf("Error happened in JSON marshal. Err: %s", err)
+			}
+
+			w.Write(jsonResp)
 			return
 		}
 
-		w.Write([]byte("SUCCESS"))
+		w.WriteHeader(http.StatusAccepted)
+		w.Header().Set("Content-Type", "application/json")
+
+		resp := make(map[string]string)
+		resp["message"] = newPath
+
+		jsonResp, err := json.Marshal(resp)
+		if err != nil {
+			log.Fatalf("Error happened in JSON marshal. Err: %s", err)
+		}
+
+		w.Write(jsonResp)
+		return
 	})
 }
 
-func renderError(w http.ResponseWriter, message string, statusCode int) {
-	w.WriteHeader(http.StatusBadRequest)
-	w.Write([]byte(message))
-}
+func runBeastHandler() http.HandlerFunc {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		enableCors(&w)
+		w.WriteHeader(http.StatusAccepted)
+		w.Header().Set("Content-Type", "application/json")
 
-func randToken(len int) string {
-	b := make([]byte, len)
-	rand.Read(b)
-	return fmt.Sprintf("%x", b)
+		resp := make(map[string]string)
+		resp["message"] = "dummy response"
+
+		jsonResp, err := json.Marshal(resp)
+		if err != nil {
+			log.Fatalf("Error happened in JSON marshal. Err: %s", err)
+		}
+
+		w.Write(jsonResp)
+		return
+	})
 }

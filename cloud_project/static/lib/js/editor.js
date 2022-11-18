@@ -1,11 +1,4 @@
-// Retrieve Elements
-const executeCodeBtn = document.querySelector(".editor__run");
-const resetCodeBtn = document.querySelector(".editor__reset");
-
-// setup Ace
 let codeEditor = ace.edit("editorCode");
-
-
 
 let editorLib = {
     init() {
@@ -19,19 +12,25 @@ let editorLib = {
     }   
 }
 
-// Events
-
-executeCodeBtn.addEventListener('click', () => {
-  // get input from code editor
-  const userCode = codeEditor.getValue();
-
-  // run user code
-  console.log(userCode);
-});
-
-resetCodeBtn.addEventListener('click', () => {
-  // clear ace editor
-  codeEditor.setValue('');
-});
 
 editorLib.init();
+        // Retrieve Elements
+        const executeCodeBtn = document.querySelector(".editor__run");
+        const resetCodeBtn = document.querySelector(".editor__reset");
+        const consoleLogs = document.querySelector(".editor__console")
+
+        // Events
+        executeCodeBtn.addEventListener('click', () => {
+            // get input from code editor
+            const userCode = codeEditor.getValue();
+            
+            // run user code
+            console.log(userCode);
+
+            consoleLogs.innerHTML += userCode
+        });
+
+        resetCodeBtn.addEventListener('click', () => {
+            // clear ace editor
+            codeEditor.setValue('');
+        });

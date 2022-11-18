@@ -5,7 +5,7 @@ EXPOSE 8080
 RUN mkdir /app
 ## We copy everything in the root directory
 ## into our /app directory
-ADD . /app
+# ADD . /app
 ## We specify that we now wish to execute 
 ## any further commands inside our /app
 ## directory
@@ -21,6 +21,7 @@ RUN wget -c https://github.com/GauravDawra/Beast/releases/download/v1.1.0/beast-
 RUN unzip beast-linux-64bit.zip
 RUN chmod +x beast
 RUN mv beast /usr/local/bin/beast
+RUN rm beast-linux-64bit.zip
 
 ## Our start command which kicks off
 ## our newly created binary executable

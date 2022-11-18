@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import daku_home, daku_file_upload, daku_file_editor
+from .views import daku_home, daku_file_editor, daku_file_upload
 
 app_name = "daku"
 

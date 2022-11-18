@@ -1,16 +1,18 @@
 {% extends '../base.html' %} {% block content %}
 
-<pre><b>beast.build</b>; Refer <a href="https://github.com/GauravDawra/Beast">here</a> for more details.</pre> 
+<div class="container">
+    <pre><b>beast.build</b>; Refer <a href="https://github.com/GauravDawra/Beast">here</a> for more details.</pre>
+    <p>{{ docker_details }}</p>
 
-<p>{{ docker_details }}</p>
+    <div id="editorCode" class="editor__code"></div>
 
-<div id="editorCode" class="editor__code"></div>
+    <button class="editor__btn editor__run">Run</button>
+    <button class="editor__btn editor__reset">Reset</button>
 
-<button class="editor__btn editor__run">Run</button>
-<button class="editor__btn editor__reset">Reset</button>
+    <pre class="pt-2">Console Logs</pre>
+    <pre class="editor__console"></pre>
 
-<div class="editor__console">
-    <ul class="editor__console-logs"></ul>
 </div>
+
 
 {% endblock %}

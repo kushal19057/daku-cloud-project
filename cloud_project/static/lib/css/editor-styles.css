@@ -7,7 +7,7 @@
 
 .editor__code {
     min-height: 500px;
-    width: 100%%;    
+    width: 100%;    
 
     border: 1px solid var(--editor-border);
 }
@@ -31,12 +31,13 @@
 }
 
 .editor__console {
-    background-color: #fff;
-    width: 100%%;
+    width: 100%;
     min-height: 130px;
     margin-top: 0.9em;
+    padding: 1em;
     border: 1px solid var(--editor-border);
     overflow: auto;
     background-color: var(--console-bg);
     color: var(--console-text-color);
 }
+
