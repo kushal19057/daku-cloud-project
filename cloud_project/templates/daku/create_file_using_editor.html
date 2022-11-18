@@ -46,6 +46,7 @@
 
     // Events
     executeCodeBtn.addEventListener('click', () => {
+        consoleLogs.innerHTML = ''
         // get input from code editor
         const userCode = codeEditor.getValue();
         beastData = {
@@ -59,7 +60,10 @@
 
         postData(url, data)
         .then((resp) => {
-            console.log(resp); 
+            resp['output'].forEach(element => {
+                console.log(element);
+                consoleLogs.innerHTML += element + "\n";
+            });
         })
  
     });
