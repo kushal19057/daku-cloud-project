@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -151,18 +152,62 @@ func uploadFileHandler() http.HandlerFunc {
 func runBeastHandler() http.HandlerFunc {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		enableCors(&w)
+
+		if r.Method == "GET" {
+			w.WriteHeader(http.StatusBadRequest)
+			w.Header().Set("Content-Type", "application/json")
+
+			resp := make(map[string]string)
+			resp["message"] = "The route does not accept GET requests. Try POST request."
+
+			jsonResp, err := json.Marshal(resp)
+			if err != nil {
+				log.Fatalf("Error happened in JSON marshal. Err: %s", err)
+			}
+
+			w.Write(jsonResp)
+			return
+		}
+
+		reqBody, err := ioutil.ReadAll(r.Body)
+
+		if err != nil {
+			w.WriteHeader(http.StatusBadRequest)
+			w.Header().Set("Content-Type", "application/json")
+
+			resp := make(map[string]string)
+			resp["message"] = "Invalid Request"
+
+			jsonResp, err := json.Marshal(resp)
+			if err != nil {
+				log.Fatalf("Error happened in JSON marshal. Err: %s", err)
+			}
+
+			w.Write(jsonResp)
+			return
+		}
+
+		fmt.Printf("%s\n", reqBody)
+		var dat map[string]interface{}
+		if err := json.Unmarshal(reqBody, &dat); err != nil {
+			log.Fatalf("Error happened in JSON marshal. Err: %s", err)
+		}
+
+		dat["data"] = "dummy"
+
+		fmt.Println(dat)
+
 		w.WriteHeader(http.StatusAccepted)
 		w.Header().Set("Content-Type", "application/json")
 
-		resp := make(map[string]string)
-		resp["message"] = "dummy response"
+		jsonResp, err := json.Marshal(dat)
 
-		jsonResp, err := json.Marshal(resp)
 		if err != nil {
 			log.Fatalf("Error happened in JSON marshal. Err: %s", err)
 		}
 
 		w.Write(jsonResp)
 		return
+
 	})
 }

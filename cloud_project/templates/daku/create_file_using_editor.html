@@ -14,5 +14,62 @@
 
 </div>
 
+<script>
+    let codeEditor = ace.edit("editorCode");
+
+    let editorLib = {
+        init() {
+            // theme
+            codeEditor.setTheme("ace/theme/eclipse");
+
+            // set options
+            codeEditor.setOptions({
+                fontSize: '24pt',
+            });
+        }
+    }
+
+    editorLib.init();
+
+    // Retrieve Elements
+    const executeCodeBtn = document.querySelector(".editor__run");
+    const resetCodeBtn = document.querySelector(".editor__reset");
+    const consoleLogs = document.querySelector(".editor__console")
+
+    resetCodeBtn.addEventListener('click', () => {
+        // clear ace editor
+        codeEditor.setValue('');
+    });
+
+    // let url = "{{ docker_details }}" + "/run_beast"
+    let url = "http://localhost:8080/run_beast"
+
+    // Events
+    executeCodeBtn.addEventListener('click', () => {
+        // get input from code editor
+        const userCode = codeEditor.getValue();
+        beastData = {
+            "script": userCode
+        }
+
+        data = {
+            method: "POST", 
+            body: JSON.stringify(beastData)
+        }
+
+        postData(url, data)
+        .then((resp) => {
+            console.log(resp); 
+        })
+ 
+    });
+
+    async function postData(url, data) {
+        const response = await fetch(url, data);
+        return response.json();
+    }
+
+</script>
+
 
 {% endblock %}
