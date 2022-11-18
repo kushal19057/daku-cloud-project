@@ -39,10 +39,11 @@
     resetCodeBtn.addEventListener('click', () => {
         // clear ace editor
         codeEditor.setValue('');
+        consoleLogs.innerHTML = '';
     });
 
-    // let url = "{{ docker_details }}" + "/run_beast"
-    let url = "http://localhost:8080/run_beast"
+    let url = "{{ docker_details }}" + "/run_beast"
+    // let url = "http://localhost:8080/run_beast"
 
     // Events
     executeCodeBtn.addEventListener('click', () => {

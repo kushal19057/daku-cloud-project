@@ -3,9 +3,9 @@ FROM golang:latest
 EXPOSE 8080
 
 RUN mkdir /app
-## We copy everything in the root directory
+## We copy main.go in the root directory
 ## into our /app directory
-# ADD . /app
+ADD main.go /app
 ## We specify that we now wish to execute 
 ## any further commands inside our /app
 ## directory
