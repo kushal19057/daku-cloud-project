@@ -9,6 +9,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"sort"
 	"strings"
 )
 
@@ -34,11 +35,68 @@ func main() {
 	// 3. route to build file and run stuff
 	http.HandleFunc("/run_beast", runBeastHandler())
 
+	// 4. List all files stored in the server
+	http.HandleFunc("/list_files", listFilesHandler())
+
 	log.Fatal(http.ListenAndServe(":8080", nil))
 }
 
 func enableCors(w *http.ResponseWriter) {
 	(*w).Header().Set("Access-Control-Allow-Origin", "*")
+}
+
+func listFilesHandler() http.HandlerFunc {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		enableCors(&w)
+
+		if r.Method == "GET" {
+			files, err := ioutil.ReadDir(uploadPath)
+			if err != nil {
+				log.Fatalf("Error happened in while walking through file directory. Err: %s", err)
+			}
+			// https://stackoverflow.com/questions/14668850/list-directory-in-go
+
+			// create an empty list
+			fileNames := []string{}
+
+			for _, f := range files {
+				fmt.Println(f.Name())
+				fileNames = append(fileNames, f.Name())
+			}
+
+			// sort alphabetically
+			sort.Strings(fileNames)
+
+			w.WriteHeader(http.StatusBadRequest)
+			w.Header().Set("Content-Type", "application/json")
+
+			resp := make(map[string]interface{})
+			resp["file_names"] = fileNames
+
+			jsonResp, err := json.Marshal(resp)
+			if err != nil {
+				log.Fatalf("Error happened in JSON marshal. Err: %s", err)
+			}
+
+			w.Write(jsonResp)
+			return
+
+		} else {
+			w.WriteHeader(http.StatusBadRequest)
+			w.Header().Set("Content-Type", "application/json")
+
+			resp := make(map[string]string)
+			resp["message"] = "Only GET requests accepted on this route"
+
+			jsonResp, err := json.Marshal(resp)
+			if err != nil {
+				log.Fatalf("Error happened in JSON marshal. Err: %s", err)
+			}
+
+			w.Write(jsonResp)
+			return
+		}
+	})
 }
 
 func uploadFileHandler() http.HandlerFunc {

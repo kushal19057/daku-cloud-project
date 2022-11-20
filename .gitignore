@@ -160,4 +160,4 @@ cython_debug/
 #.idea/
 
 # golang WIP stuff
-go app/tmp/
+go_app/tmp/

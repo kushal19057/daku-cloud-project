@@ -1,10 +1,51 @@
-{% extends "../base.html" %} 
+{% extends "../base.html" %}
 
 {% block content %}
 
 <div class="container">
     <h1>Home Page for Daku</h1>
     <p>File contents stored on server will come here.</p>
+    <div id="fileList">
+
+    </div>
+
+    <script type="text/javascript">
+        let url = "http://localhost:" + "{{docker_port}}" + "/list_files"
+        console.log(url)
+
+        
+
+        async function getFileNames() {
+            data = {
+                method: "GET"
+            }
+
+            getRequest(url, data)
+                .then((resp) => {
+                    document.getElementById("fileList").innerHTML = '';
+
+                    resp['file_names'].forEach(element => {
+                        console.log(element);
+                        document.getElementById("fileList").innerHTML += "<p>" + element + "</p>";
+                    });
+
+                    console.log(resp);
+                })
+        }
+
+        async function getRequest(url, data) {
+            try {
+                const response = await fetch(url, data);
+                return response.json();
+            } catch (e) {
+                console.error(e);
+            }
+        }
+
+        getFileNames()
+        
+    </script>
+
 </div>
 
 

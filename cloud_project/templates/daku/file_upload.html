@@ -35,6 +35,7 @@
 
             postData(url, data)
             .then((resp) => {
+                document.getElementById("uploadfilelogs").innerHTML = ''
                 document.getElementById("uploadfilelogs").innerHTML += "file saved at: " + resp.message;
                 console.log(resp);
             })
