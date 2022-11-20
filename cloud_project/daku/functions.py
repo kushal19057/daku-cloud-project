@@ -5,11 +5,12 @@ import os
 from .models import Container
 
 
-def get_docker_url(user):
+def get_docker_ip_port(user):
     client = docker.from_env()
     c = Container.objects.get(user=user)
 
-    output = "None"
+    ip = None
+    port = None
 
     if c is not None:
         container_id = c.container_id
@@ -20,7 +21,7 @@ def get_docker_url(user):
         print(container.id + " connection established | status = " + container.status)
         print(hostIp, hostPort)
 
-        url = f"http://{hostIp}:{hostPort}"
-        output = url
+        ip = hostIp
+        port = hostPort
     
-    return output
+    return ip, port

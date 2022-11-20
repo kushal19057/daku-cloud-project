@@ -42,9 +42,11 @@
         consoleLogs.innerHTML = '';
     });
 
-    let url = "{{ docker_details }}" + "/run_beast"
+    // let url = "{{ docker_details }}" + "/run_beast"
     // let url = "http://localhost:8080/run_beast"
-
+    let url = "http://localhost:" + "{{docker_port}}" + "/run_beast"
+    console.log(url)
+    
     // Events
     executeCodeBtn.addEventListener('click', () => {
         consoleLogs.innerHTML = ''
