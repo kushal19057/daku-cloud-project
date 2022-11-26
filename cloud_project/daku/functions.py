@@ -6,8 +6,10 @@ from .models import Container
 
 
 def get_docker_ip_port(user):
-    client = docker.from_env()
+    # using remote containers now
     c = Container.objects.get(user=user)
+    
+    client = docker.DockerClient(base_url='tcp://192.168.192.148:2375', tls=False, version='auto')
 
     ip = None
     port = None
@@ -25,3 +27,21 @@ def get_docker_ip_port(user):
         port = hostPort
     
     return ip, port
+
+
+def upload_file_to_container(user, file):
+    ip, port = get_docker_ip_port(user)
+    post_data = {'uploadFile': file}
+    url = f"http://{ip}:{port}/upload_file"
+    response = requests.post(url, data=post_data)
+    print(response)
+    return response.content
+
+def run_beast_on_container(user, files):
+    pass
+
+def get_available_docker_ip_port():
+    """
+    returns ip, port
+    """
+    return "localhost", "2375"

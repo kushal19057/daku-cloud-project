@@ -7,9 +7,10 @@
   <p><strong>Email : </strong> {{user.email}}</p>
   <p><strong>Last login : </strong> {{user.last_login}}</p>
   <p><strong>My containers currently running : </strong></p>
+  
   {% for container in containers %}
-  <p>{{container.container_id}}/p>
-    {% endfor %}
+    <p>{{container.container_id}}</p>
+  {% endfor %}
 
 </div>
 

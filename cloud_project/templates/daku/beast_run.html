@@ -42,9 +42,8 @@
         consoleLogs.innerHTML = '';
     });
 
-    // let url = "{{ docker_details }}" + "/run_beast"
-    // let url = "http://localhost:8080/run_beast"
-    let url = "http://localhost:" + "{{docker_port}}" + "/run_beast"
+    // hardcode external IP for now
+    let url = "http://192.168.192.148:" + "{{docker_port}}" + "/run_beast"
     console.log(url)
     
     // Events

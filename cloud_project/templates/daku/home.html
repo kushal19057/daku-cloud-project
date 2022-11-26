@@ -6,12 +6,12 @@
     <h1>Home Page for Daku</h1>
     <p>File contents stored on server will come here.</p>
     <div id="fileList">
-
     </div>
 
     <script type="text/javascript">
-        let url = "http://localhost:" + "{{docker_port}}" + "/list_files"
-        console.log(url)
+        // hardcode external server IP for now
+        // let url = "http://192.168.192.148:" + "{{docker_port}}" + "/list_files"
+        // console.log(url)
 
         
 
@@ -42,7 +42,7 @@
             }
         }
 
-        getFileNames()
+        // getFileNames()
         
     </script>
 

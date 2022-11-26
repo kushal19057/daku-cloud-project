@@ -13,9 +13,7 @@ import docker
 from .tokens import account_activation_token
 from .forms import RegistrationForm
 from daku.models import Container
-
-import subprocess
-import shlex
+from daku.functions import get_available_docker_ip_port
 
 @login_required
 def dashboard(request):
@@ -48,11 +46,13 @@ def account_register(request):
 
             user.email_user(subject=subject, message=message)
 
-            client = docker.from_env()
+            # create a docker container on remote server
+            ip, port = get_available_docker_ip_port()
+            url = f"tcp://{ip}:{port}"
+            client = docker.DockerClient(base_url=url, tls=False, version='auto')
             container = client.containers.run("my-go-app", ports={8080:None}, detach=True)
             container.reload()
             print(container.ports)
-            # subprocess.run(shlex.split("docker run -p 8080:8080 -it my-go-app"))
 
             c = Container(user=user, container_id = container.id)
             c.save()
