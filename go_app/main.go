@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -44,7 +45,13 @@ func main() {
 	http.HandleFunc("/list_files", listFilesHandler())
 
 	// 5. Get the size of current directory working files
-	http.HandleFunc("/get_size_pwd", getSizePwd())
+	http.HandleFunc("/get_size_pwd", getSizePwdHandler())
+
+	// 6. Delete File
+	http.HandleFunc("/delete_file", deleteFileHandler())
+
+	// 7. Download File
+	http.HandleFunc("/download_file", downloadFileHandler())
 
 	log.Fatal(http.ListenAndServe(":8080", nil))
 }
@@ -53,8 +60,110 @@ func enableCors(w *http.ResponseWriter) {
 	(*w).Header().Set("Access-Control-Allow-Origin", "*")
 }
 
+func deleteFileHandler() http.HandlerFunc {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		enableCors(&w)
+		if r.Method == "GET" {
+			w.WriteHeader(http.StatusBadRequest)
+			w.Header().Set("Content-Type", "application/json")
+
+			resp := make(map[string]string)
+			resp["message"] = "The route does not accept GET requests. Try POST request."
+
+			jsonResp, err := json.Marshal(resp)
+			if err != nil {
+				log.Fatalf("Error happened in JSON marshal. Err: %s", err)
+			}
+
+			w.Write(jsonResp)
+			return
+		}
+
+		if err := r.ParseForm(); err != nil {
+			log.Fatalf("Error happened in parsing POST form. Err: %s", err)
+		}
+
+		fileName := r.FormValue("file_name")
+		filePath := filepath.Join(uploadPath, fileName)
+
+		inputFile, err := os.Open(filePath)
+
+		if err != nil {
+			log.Fatalf("Error happened in file opening at original location. Err: %s", err)
+		}
+
+		deleteFilePath := filepath.Join(deletePath, fileName)
+		deletedFile, err := os.Create(deleteFilePath)
+
+		if err != nil {
+			inputFile.Close()
+			log.Fatalf("Error happened in file creating at deletion location. Err: %s", err)
+		}
+
+		defer deletedFile.Close()
+		_, err = io.Copy(deletedFile, inputFile)
+		inputFile.Close()
+
+		if err != nil {
+			log.Fatalf("Error happened in file content copying. Err: %s", err)
+		}
+
+		err = os.Remove(filePath)
+		if err != nil {
+			log.Fatalf("Error in deleting original file. Err: %s", err)
+		}
+
+		// TODO change http status headers in all places
+		w.WriteHeader(http.StatusAccepted)
+		w.Header().Set("Content-Type", "application/json")
+
+		resp := make(map[string]interface{})
+		resp["fileToBeDeleted"] = fileName
+		resp["status"] = "Deleted"
+
+		jsonResp, err := json.Marshal(resp)
+		if err != nil {
+			log.Fatalf("Error happened in JSON marshal. Err: %s", err)
+		}
+
+		w.Write(jsonResp)
+
+		return
+	})
+}
+
+func downloadFileHandler() http.HandlerFunc {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		enableCors(&w)
+		if r.Method == "GET" {
+			w.WriteHeader(http.StatusBadRequest)
+			w.Header().Set("Content-Type", "application/json")
+
+			resp := make(map[string]string)
+			resp["message"] = "The route does not accept GET requests. Try POST request."
+
+			jsonResp, err := json.Marshal(resp)
+			if err != nil {
+				log.Fatalf("Error happened in JSON marshal. Err: %s", err)
+			}
+
+			w.Write(jsonResp)
+			return
+		}
+
+		if err := r.ParseForm(); err != nil {
+			log.Fatalf("Error happened in parsing POST form. Err: %s", err)
+		}
+
+		fileName := r.FormValue("file_name")
+		filePath := filepath.Join(uploadPath, fileName)
+
+		http.ServeFile(w, r, filePath)
+	})
+}
+
 // https://stackoverflow.com/questions/32482673/how-to-get-directory-total-size
-func getSizePwd() http.HandlerFunc {
+func getSizePwdHandler() http.HandlerFunc {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		enableCors(&w)
 

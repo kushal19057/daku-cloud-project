@@ -33,10 +33,9 @@
     </script>
 
     <h1>Upload files to Server</h1>
-    <p> {{docker_ip}} </p>
-    <p> {{docker_port}} </p>                                
-    <input id="fileupload" type="file" />
-    <button onclick="uploadFile()">Upload File</button>
+    <p>Pick a file from your file directory to upload to the server ... </p>                          
+    <input  id="fileupload" type="file"/>
+    <button onclick="uploadFile()" class='btn btn-primary btn-sm'>Upload File</button>
 
     <p id="uploadfilelogs"></p>
 

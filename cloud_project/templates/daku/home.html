@@ -4,22 +4,41 @@
 
 <div class="container">
     <h1>Home Page for Daku</h1>
-    <p>File contents stored on server will come here.</p>
+    <p>File contents stored on server :</p>
 
     <table id="fileTableList" class="table table-hover">
         <thead>
             <tr>
                 <th scope="col">#</th>
                 <th scope="col">File Name</th>
+                <th scope="col"></th>
+                <th scope="col"></th>
+                <th scope="col"></th>
             </tr>
         </thead>
         <tbody></tbody>
     </table>
     <!-- https://stackoverflow.com/questions/18333427/how-to-insert-a-row-in-an-html-table-body-in-javascript#:~:text=insertRow(tableRef.,the%20end%20of%20the%20table. -->
     <script type="text/javascript">
+
+        
         IP = "{{docker_ip}}"
         PORT = "{{docker_port}}"
         url = "http://" + IP + ":" + PORT + "/list_files"
+
+        function handleFileDelete(filename) {
+            console.log("Delete - " + filename);
+            
+        }
+
+        function handleFileDownload(filename) {
+            console.log("Download - " + filename);
+        }
+
+        function handleFileView(filename) {
+            console.log("View - " + filename);
+        }
+
 
         var tBodyRef = document.getElementById('fileTableList').getElementsByTagName('tbody')[0];
         fetch(url).then((response) => {
@@ -35,20 +54,31 @@
 
                     var cell_idx = document.createElement('td');
                     var cell_value = document.createElement('td');
+                    
+                    var cell_view = document.createElement('td');
+                    var cell_download = document.createElement('td');
+                    var cell_delete = document.createElement('td');
+                    
+                    
                     cell_idx.innerHTML = i;
                     cell_value.innerHTML = value;
+                    
+                    cell_view.innerHTML = "<button class='btn btn-primary btn-sm' onclick='handleFileView(value)' type='button'>view</button>";
+                    cell_delete.innerHTML = "<button class='btn btn-danger btn-sm' onclick='handleFileDelete(value)' onclick='handleFileView(value)type='button'>delete</button>";
+                    cell_download.innerHTML = "<button class='btn btn-secondary btn-sm' onclick='handleFileDownload(value)' type='button'>download</button>";
                 
                     row.appendChild(cell_idx);
                     row.appendChild(cell_value);
-
+                    row.appendChild(cell_view)
+                    row.appendChild(cell_download);
+                    row.appendChild(cell_delete);
+                    
                     tBodyRef.appendChild(row);
                 });
             }).catch(error => {
                 console.log("error happened")
                 console.dir(error)
             });
-
-
     </script>
 
 
