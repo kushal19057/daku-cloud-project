@@ -5,46 +5,52 @@
 <div class="container">
     <h1>Home Page for Daku</h1>
     <p>File contents stored on server will come here.</p>
-    <div id="fileList">
-    </div>
 
+    <table id="fileTableList" class="table table-hover">
+        <thead>
+            <tr>
+                <th scope="col">#</th>
+                <th scope="col">File Name</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+    <!-- https://stackoverflow.com/questions/18333427/how-to-insert-a-row-in-an-html-table-body-in-javascript#:~:text=insertRow(tableRef.,the%20end%20of%20the%20table. -->
     <script type="text/javascript">
-        // hardcode external server IP for now
-        // let url = "http://192.168.192.148:" + "{{docker_port}}" + "/list_files"
-        // console.log(url)
+        IP = "{{docker_ip}}"
+        PORT = "{{docker_port}}"
+        url = "http://" + IP + ":" + PORT + "/list_files"
 
-        
+        var tBodyRef = document.getElementById('fileTableList').getElementsByTagName('tbody')[0];
+        fetch(url).then((response) => {
+            return response.json()
+        })
+            .then((data) => {
+                console.log(data.file_names)
+                const fileNames = data.file_names;
+                fileNames.sort();
+                fileNames.forEach(function(value, i) {
+                    console.log("%d: %s", i, value)
+                    var row = document.createElement('tr');
 
-        async function getFileNames() {
-            data = {
-                method: "GET"
-            }
+                    var cell_idx = document.createElement('td');
+                    var cell_value = document.createElement('td');
+                    cell_idx.innerHTML = i;
+                    cell_value.innerHTML = value;
+                
+                    row.appendChild(cell_idx);
+                    row.appendChild(cell_value);
 
-            getRequest(url, data)
-                .then((resp) => {
-                    document.getElementById("fileList").innerHTML = '';
+                    tBodyRef.appendChild(row);
+                });
+            }).catch(error => {
+                console.log("error happened")
+                console.dir(error)
+            });
 
-                    resp['file_names'].forEach(element => {
-                        console.log(element);
-                        document.getElementById("fileList").innerHTML += "<p>" + element + "</p>";
-                    });
 
-                    console.log(resp);
-                })
-        }
-
-        async function getRequest(url, data) {
-            try {
-                const response = await fetch(url, data);
-                return response.json();
-            } catch (e) {
-                console.error(e);
-            }
-        }
-
-        // getFileNames()
-        
     </script>
+
 
 </div>
 
