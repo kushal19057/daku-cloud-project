@@ -13,17 +13,22 @@ import docker
 from .tokens import account_activation_token
 from .forms import RegistrationForm
 from daku.models import Container
-from daku.functions import get_available_docker_ip_port
+from daku.functions import get_available_docker_ip_port, get_docker_ip_port
 
 @login_required
 def dashboard(request):
     containers = Container.objects.filter(user=request.user)
+    ip, port = get_docker_ip_port(request.user)
     return render(request,
                   'account/user/dashboard.html',
-                  {'containers': containers})
+                  {
+                    'containers': containers, 
+                    'docker_ip': ip, 
+                    'docker_port': port, 
+                  }
+                  )
 
 def account_register(request):
-
     if request.user.is_authenticated:
         return redirect('account:dashboard')
 

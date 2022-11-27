@@ -19,11 +19,16 @@ import (
 // TODO : handle persist code (daku_mantra) before communicating with user
 
 const uploadPath = "./tmp/"
+const deletePath = "./bin/"
 
 func main() {
 	// NOTE : ensure that ./tmp directory already exists
-	newpath := filepath.Join(".", "tmp")
-	_ = os.MkdirAll(newpath, os.ModePerm)
+	newPath := filepath.Join(".", "tmp")
+	_ = os.MkdirAll(newPath, os.ModePerm)
+
+	// NOTE : ensure that ./bin directory already exists
+	newPath = filepath.Join(".", "bin")
+	_ = os.MkdirAll(newPath, os.ModePerm)
 
 	// 1. route to upload file to server
 	http.HandleFunc("/upload_file", uploadFileHandler())
@@ -38,11 +43,53 @@ func main() {
 	// 4. List all files stored in the server
 	http.HandleFunc("/list_files", listFilesHandler())
 
+	// 5. Get the size of current directory working files
+	http.HandleFunc("/get_size_pwd", getSizePwd())
+
 	log.Fatal(http.ListenAndServe(":8080", nil))
 }
 
 func enableCors(w *http.ResponseWriter) {
 	(*w).Header().Set("Access-Control-Allow-Origin", "*")
+}
+
+// https://stackoverflow.com/questions/32482673/how-to-get-directory-total-size
+func getSizePwd() http.HandlerFunc {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		enableCors(&w)
+
+		if r.Method == "GET" {
+			var size int64
+			err := filepath.Walk(uploadPath, func(_ string, info os.FileInfo, err error) error {
+				if err != nil {
+					log.Fatalf("Error happened in while walking through file directory. Err: %s", err)
+				}
+				if !info.IsDir() {
+					size += info.Size()
+				}
+
+				return err
+			})
+
+			if err != nil {
+				log.Fatalf("Error happened in while calculating file directory size. Err: %s", err)
+			}
+
+			w.WriteHeader(http.StatusBadRequest)
+			w.Header().Set("Content-Type", "application/json")
+
+			resp := make(map[string]interface{})
+			resp["size"] = size
+
+			jsonResp, err := json.Marshal(resp)
+			if err != nil {
+				log.Fatalf("Error happened in JSON marshal. Err: %s", err)
+			}
+
+			w.Write(jsonResp)
+			return
+		}
+	})
 }
 
 func listFilesHandler() http.HandlerFunc {
