@@ -1,9 +1,10 @@
-from flask import render_template, flash, redirect, url_for, request
+from flask import render_template, flash, redirect, url_for, request, jsonify
 from flaskapp import app, db, bcrypt
 from flaskapp.forms import RegistrationForm, LoginForm
 from flaskapp.models import User
 from flask_login import login_user, current_user, logout_user, login_required
 import docker
+from flaskapp.functions import get_docker_ip_port
 
 @app.route("/")
 @app.route("/home")
@@ -67,3 +68,17 @@ def login():
 def logout():
     logout_user()
     return redirect(url_for('home'))
+
+
+# routes for container work
+@app.route("/upload")
+@login_required
+def upload_file():
+    return render_template("container_file_upload.html")
+
+@app.route("/docker")
+@login_required
+def docker_details():
+    ip, port = get_docker_ip_port(current_user)
+    docker_details = {'ip': ip, 'port': port}
+    return jsonify(docker_details)
