@@ -3,7 +3,7 @@ from flaskapp import app, db, bcrypt
 from flaskapp.forms import RegistrationForm, LoginForm
 from flaskapp.models import User
 from flask_login import login_user, current_user, logout_user, login_required
-
+import docker
 
 @app.route("/")
 @app.route("/home")
@@ -28,10 +28,12 @@ def register():
         hashed_password = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
 
         # create container here
-        # TODO
+        client = docker.from_env()
+        container = client.containers.run("my-go-app", ports={8080:None}, detach=True)
+        container.reload()
 
         # create user instance
-        user = User(username=form.username.data, email=form.email.data, password=hashed_password, container_id="0")
+        user = User(username=form.username.data, email=form.email.data, password=hashed_password, container_id=container.id)
         db.session.add(user)
 
         db.session.commit()

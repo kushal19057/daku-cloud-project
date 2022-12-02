@@ -161,3 +161,6 @@ cython_debug/
 
 # golang WIP stuff
 go_app/tmp/
+
+# fleet config files
+.fleet/
