@@ -164,3 +164,7 @@ go_app/tmp/
 
 # fleet config files
 .fleet/
+
+# goapp files when testing code
+goapp/tmp/
+goapp/bin/

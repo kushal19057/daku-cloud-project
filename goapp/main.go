@@ -39,12 +39,11 @@ func main() {
 	http.HandleFunc("/size", getWorkDirSizeHandler())
 	// 4. route to build file and run stuff
 	http.HandleFunc("/beast", runBeastHandler())
+	// 5. Delete File
+	http.HandleFunc("/delete", deleteFileHandler())
 
 	// 2. List all files stored in the bin
 	// http.HandleFunc("/bin", listBinFilesHandler())
-
-	// // 6. Delete File
-	// http.HandleFunc("/delete_file", deleteFileHandler())
 
 	// // 7. Download File
 	// http.HandleFunc("/download_file", downloadFileHandler())
@@ -148,80 +147,58 @@ func listWorkFilesHandler() http.HandlerFunc {
 	})
 }
 
+// 5. Handle file deletion (move from /tmp to /bin)
+func deleteFileHandler() http.HandlerFunc {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		enableCors(&w)
+
+		if r.Method == "POST" {
+			reqBody, err := ioutil.ReadAll(r.Body)
+
+			if err != nil {
+				w.WriteHeader(http.StatusBadRequest)
+				fmt.Println("Cannot reqd request body")
+				fmt.Printf("%s\n", err.Error())
+				return
+			}
+
+			var data map[string]interface{}
+			if err := json.Unmarshal(reqBody, &data); err != nil {
+				fmt.Println("Cannot unmarshal request body to json")
+				fmt.Printf("%s\n", err.Error())
+				w.WriteHeader(http.StatusInternalServerError)
+				return
+			}
+
+			file_name := data["file"].(string)
+			file_path := filepath.Join(UPLOAD_PATH, file_name)
+			bin_file_path := filepath.Join(BIN_PATH, file_name)
+
+			err = os.Chmod(file_path, 0777)
+			if err != nil {
+				fmt.Println(err.Error())
+				w.WriteHeader(http.StatusInternalServerError)
+				return
+			}
+
+			err = os.Rename(file_path, bin_file_path)
+			if err != nil {
+				fmt.Println(err.Error())
+				w.WriteHeader(http.StatusInternalServerError)
+				return
+			}
+
+			w.WriteHeader(http.StatusAccepted)
+			return
+		}
+
+		w.WriteHeader(http.StatusBadRequest)
+		fmt.Println("Only POST requests accepted on the /delete route")
+		return
+	})
+}
+
 /*
-// func deleteFileHandler() http.HandlerFunc {
-// 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-// 		enableCors(&w)
-
-// 		if r.Method == "GET" {
-// 			w.WriteHeader(http.StatusBadRequest)
-// 			w.Header().Set("Content-Type", "application/json")
-
-// 			resp := make(map[string]string)
-// 			resp["message"] = "The route does not accept GET requests. Try POST request."
-
-// 			jsonResp, err := json.Marshal(resp)
-// 			if err != nil {
-// 				log.Fatalf("Error happened in JSON marshal. Err: %s", err)
-// 			}
-
-// 			w.Write(jsonResp)
-// 			return
-// 		}
-
-// 		if err := r.ParseForm(); err != nil {
-// 			log.Fatalf("Error happened in parsing POST form. Err: %s", err)
-// 		}
-
-// 		fileName := r.FormValue("file_name")
-// 		filePath := filepath.Join(uploadPath, fileName)
-
-// 		inputFile, err := os.Open(filePath)
-
-// 		if err != nil {
-// 			log.Fatalf("Error happened in file opening at original location. Err: %s", err)
-// 		}
-
-// 		deleteFilePath := filepath.Join(deletePath, fileName)
-// 		deletedFile, err := os.Create(deleteFilePath)
-
-// 		if err != nil {
-// 			inputFile.Close()
-// 			log.Fatalf("Error happened in file creating at deletion location. Err: %s", err)
-// 		}
-
-// 		defer deletedFile.Close()
-// 		_, err = io.Copy(deletedFile, inputFile)
-// 		inputFile.Close()
-
-// 		if err != nil {
-// 			log.Fatalf("Error happened in file content copying. Err: %s", err)
-// 		}
-
-// 		err = os.Remove(filePath)
-// 		if err != nil {
-// 			log.Fatalf("Error in deleting original file. Err: %s", err)
-// 		}
-
-// 		// TODO change http status headers in all places
-// 		w.WriteHeader(http.StatusAccepted)
-// 		w.Header().Set("Content-Type", "application/json")
-
-// 		resp := make(map[string]interface{})
-// 		resp["fileToBeDeleted"] = fileName
-// 		resp["status"] = "Deleted"
-
-// 		jsonResp, err := json.Marshal(resp)
-// 		if err != nil {
-// 			log.Fatalf("Error happened in JSON marshal. Err: %s", err)
-// 		}
-
-// 		w.Write(jsonResp)
-
-// 		return
-// 	})
-// }
-
 // func downloadFileHandler() http.HandlerFunc {
 // 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 // 		enableCors(&w)
