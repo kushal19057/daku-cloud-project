@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"log"
@@ -41,12 +42,13 @@ func main() {
 	http.HandleFunc("/beast", runBeastHandler())
 	// 5. Delete File
 	http.HandleFunc("/delete", deleteFileHandler())
+	// 6. Download File
+	http.HandleFunc("/download", downloadFileHandler())
 
 	// 2. List all files stored in the bin
 	// http.HandleFunc("/bin", listBinFilesHandler())
 
-	// // 7. Download File
-	// http.HandleFunc("/download_file", downloadFileHandler())
+	//
 
 	log.Fatal(http.ListenAndServe(":8080", nil))
 }
@@ -200,37 +202,60 @@ func deleteFileHandler() http.HandlerFunc {
 	})
 }
 
-/*
-// func downloadFileHandler() http.HandlerFunc {
-// 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-// 		enableCors(&w)
-// 		if r.Method == "GET" {
-// 			w.WriteHeader(http.StatusBadRequest)
-// 			w.Header().Set("Content-Type", "application/json")
+// 6. Download file handler
+func downloadFileHandler() http.HandlerFunc {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		enableCors(&w)
+		if r.Method == "POST" {
+			reqBody, err := ioutil.ReadAll(r.Body)
 
-// 			resp := make(map[string]string)
-// 			resp["message"] = "The route does not accept GET requests. Try POST request."
+			if err != nil {
+				w.WriteHeader(http.StatusBadRequest)
+				fmt.Println("Cannot reqd request body")
+				fmt.Printf("%s\n", err.Error())
+				return
+			}
 
-// 			jsonResp, err := json.Marshal(resp)
-// 			if err != nil {
-// 				log.Fatalf("Error happened in JSON marshal. Err: %s", err)
-// 			}
+			var data map[string]interface{}
+			if err := json.Unmarshal(reqBody, &data); err != nil {
+				fmt.Println("Cannot unmarshal request body to json")
+				fmt.Printf("%s\n", err.Error())
+				w.WriteHeader(http.StatusInternalServerError)
+				return
+			}
 
-// 			w.Write(jsonResp)
-// 			return
-// 		}
+			file_name := data["file"].(string)
+			file_path := filepath.Join(UPLOAD_PATH, file_name)
 
-// 		if err := r.ParseForm(); err != nil {
-// 			log.Fatalf("Error happened in parsing POST form. Err: %s", err)
-// 		}
+			// https://stackoverflow.com/a/12518877
+			if _, err := os.Stat(file_path); err == nil {
+				// path/to/whatever exists
+				w.WriteHeader(http.StatusAccepted)
+				http.ServeFile(w, r, file_path)
+				return
+			} else if errors.Is(err, os.ErrNotExist) {
+				// path/to/whatever does *not* exist
+				w.WriteHeader(http.StatusBadRequest)
+				fmt.Println("File not found on server")
+				return
+			} else {
+				// Schrodinger: file may or may not exist. See err for details.
 
-// 		fileName := r.FormValue("file_name")
-// 		filePath := filepath.Join(uploadPath, fileName)
+				// Therefore, do *NOT* use !os.IsNotExist(err) to test for file existence
+				w.WriteHeader(http.StatusBadRequest)
+				fmt.Println("File not found on server | schrodinger")
+				return
+			}
 
-// 		http.ServeFile(w, r, filePath)
-// 	})
-// }
-*/
+		}
+
+		// handle non POST requests
+		w.WriteHeader(http.StatusBadRequest)
+		fmt.Println("/download route only handle POST requests")
+		return
+
+	})
+}
 
 // https://stackoverflow.com/questions/32482673/how-to-get-directory-total-size
 // 3. Handle calculating the size of all files in the /tmp folder
