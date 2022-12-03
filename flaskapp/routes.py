@@ -74,11 +74,5 @@ def logout():
 @app.route("/upload")
 @login_required
 def upload_file():
-    return render_template("container_file_upload.html")
-
-@app.route("/docker")
-@login_required
-def docker_details():
-    ip, port = get_docker_ip_port(current_user)
-    docker_details = {'ip': ip, 'port': port}
-    return jsonify(docker_details)
+    docker_ip, docker_port = get_docker_ip_port(current_user)
+    return render_template("container_file_upload.html", docker_ip=docker_ip, docker_port=docker_port)

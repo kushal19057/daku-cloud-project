@@ -17,29 +17,24 @@
                 body: formData
             }
 
-            docker_details = "{{docker_details}}"
-            docker_details = docker_details.JSON()
-            
-            console.log(docker_details)
-            let IP = docker_details['ip']
+            let IP = "{{docker_ip}}"
             let PORT = "{{docker_port}}"
+            console.log(IP, PORT)
+
             let url = "http://" + IP + ":" + PORT + "/upload_file"
             console.log(url)
 
             postData(url, data).then((resp) => {
-                document.getElementById("uploadfilelogs").innerHTML = "file saved at: " + resp.message;
                 console.log(resp);
             })
         }
 
     </script>
 
-    <h1>Upload files to Server</h1>
     <p>Pick a file from your file directory to upload to the server ... </p>                          
     <input  id="fileupload" type="file"/>
     <button onclick="uploadFile()" class='btn btn-primary btn-sm'>Upload File</button>
 
-    <p id="uploadfilelogs"></p>
 </div>
 
 {% endblock %}
