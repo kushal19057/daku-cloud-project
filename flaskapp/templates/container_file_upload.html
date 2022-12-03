@@ -6,27 +6,31 @@
     <script type="text/javascript">
         async function postData(url, data) {
             const response = await fetch(url, data);
-            return response.json();
+            console.log(data)
+            console.log(response)
+            return response;
         }
 
-        async function uploadFile() {
+        uploadFile = async () => {
+            const fileupload = document.getElementById("fileupload");
             let formData = new FormData();
             formData.append("upload_file", fileupload.files[0]);
-            data = {
+
+            const data = {
                 method: "POST",
                 body: formData
-            }
+            };
 
-            let IP = "{{docker_ip}}"
-            let PORT = "{{docker_port}}"
+            const  IP = "{{docker_ip}}";
+            const PORT = "{{docker_port}}";
+
             console.log(IP, PORT)
 
-            let url = "http://" + IP + ":" + PORT + "/upload_file"
-            console.log(url)
+            const url = "http://" + IP + ":" + PORT + "/upload";
+            console.log(url);
 
-            postData(url, data).then((resp) => {
-                console.log(resp);
-            })
+            const resp = await postData(url, data)
+            console.log(resp)
         }
 
     </script>
