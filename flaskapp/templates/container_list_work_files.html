@@ -1,10 +1,10 @@
 {% extends 'layout.html' %}
 
 {% block content %}
-    <div class="container">
-        <p>Files stored on server ...</p>
-        <table id="fileTableList" class="table table-hover">
-            <thead>
+<div class="container">
+    <p>Files stored on server ...</p>
+    <table id="fileTableList" class="table table-hover">
+        <thead>
             <tr>
                 <th scope="col">#</th>
                 <th scope="col">File Name</th>
@@ -12,89 +12,112 @@
                 <th scope="col"></th>
                 <th scope="col"></th>
             </tr>
-            </thead>
-            <tbody></tbody>
-        </table>
+        </thead>
+        <tbody></tbody>
+    </table>
 
-        <!-- https://stackoverflow.com/questions/18333427/how-to-insert-a-row-in-an-html-table-body-in-javascript#:~:text=insertRow(tableRef.,the%20end%20of%20the%20table. -->
-        <script type="text/javascript">
-            const IP = "{{docker_ip}}";
-            const PORT = "{{docker_port}}";
-            const url = "http://" + IP + ":" + PORT + "/files";
+    <!-- https://stackoverflow.com/questions/18333427/how-to-insert-a-row-in-an-html-table-body-in-javascript#:~:text=insertRow(tableRef.,the%20end%20of%20the%20table. -->
+    <script type="text/javascript">
+        const IP = "{{docker_ip}}";
+        const PORT = "{{docker_port}}";
+        const url = "http://" + IP + ":" + PORT + "/files";
 
-            console.log(url);
+        console.log(url);
 
-            const tBodyRef = document.getElementById('fileTableList').getElementsByTagName('tbody')[0];
+        const tBodyRef = document.getElementById('fileTableList').getElementsByTagName('tbody')[0];
 
-            fetch(url).then((response) => {
-                return response.json()
-            })
-                .then((data) => {
-                    console.log(data);
-                    console.log(data.files)
-                    const fileNames = data.files;
-                    fileNames.forEach(function (value, i) {
-                        console.log("%d: %s", i, value)
-                        let row = document.createElement('tr');
+        fetch(url).then((response) => {
+            return response.json()
+        })
+            .then((data) => {
+                console.log(data);
+                console.log(data.files)
+                const fileNames = data.files;
+                fileNames.forEach(function (value, i) {
+                    console.log("%d: %s", i, value)
+                    let row = document.createElement('tr');
 
-                        let cell_idx = document.createElement('td');
-                        let cell_value = document.createElement('td');
+                    let cell_idx = document.createElement('td');
+                    let cell_value = document.createElement('td');
 
-                        let cell_view = document.createElement('td');
-                        let cell_download = document.createElement('td');
-                        let cell_delete = document.createElement('td');
+                    let cell_view = document.createElement('td');
+                    let cell_download = document.createElement('td');
+                    let cell_delete = document.createElement('td');
 
 
-                        cell_idx.innerHTML = i;
-                        cell_value.innerHTML = value;
+                    cell_idx.innerHTML = i;
+                    cell_value.innerHTML = value;
 
-                        cell_view.innerHTML = "<button class='btn btn-primary btn-sm' type='button'>view</button>";
-                        cell_delete.innerHTML = `<button class='btn btn-danger btn-sm' type='button'>delete</button>`;
-                        cell_download.innerHTML = "<button class='btn btn-secondary btn-sm' type='button'>download</button>";
-                        
-                        // https://stackoverflow.com/questions/9643311/pass-a-string-parameter-in-an-onclick-function
+                    cell_view.innerHTML = "<button class='btn btn-primary btn-sm' type='button'>view</button>";
+                    cell_delete.innerHTML = `<button class='btn btn-danger btn-sm' type='button'>delete</button>`;
+                    cell_download.innerHTML = "<button class='btn btn-secondary btn-sm' type='button'>download</button>";
 
-                        cell_delete.addEventListener('click', function() {
-                            deleteFile(value);
-                        });
+                    // https://stackoverflow.com/questions/9643311/pass-a-string-parameter-in-an-onclick-function
 
-                        cell_view.addEventListener('click', function() {
-                            viewFile(value);
-                        });
-
-                        cell_download.addEventListener('click', function() {
-                            downloadFile(value);
-                        });
-
-                        row.appendChild(cell_idx);
-                        row.appendChild(cell_value);
-                        row.appendChild(cell_view)
-                        row.appendChild(cell_download);
-                        row.appendChild(cell_delete);
-
-                        tBodyRef.appendChild(row);
+                    cell_delete.addEventListener('click', function () {
+                        deleteFile(value);
                     });
-                }).catch(error => {
+
+                    cell_view.addEventListener('click', function () {
+                        viewFile(value);
+                    });
+
+                    cell_download.addEventListener('click', function () {
+                        downloadFile(value);
+                    });
+
+                    row.appendChild(cell_idx);
+                    row.appendChild(cell_value);
+                    row.appendChild(cell_view)
+                    row.appendChild(cell_download);
+                    row.appendChild(cell_delete);
+
+                    tBodyRef.appendChild(row);
+                });
+            }).catch(error => {
                 console.log("error happened")
                 console.dir(error)
             });
 
 
-            function deleteFile(value) {
-                console.log(value);
+        function deleteFile(value) {
+            console.log(value);
+            const ip = "{{ docker_ip }}";
+            const port = "{{ docker_port }}";
+            const url = "http://" + ip + ":" + port + "/delete";
+            console.log(url);
+
+            deleteFileData = {
+                "file": value
             }
 
-            function downloadFile(value) {
-                console.log(value);
+            data = {
+                method: "POST",
+                body: JSON.stringify(deleteFileData)
             }
 
-            function viewFile(value) {
-                console.log(value);
-            }
+            postData(url, data);
 
-        </script>
+            window.location.reload();
+        }
+
+        function downloadFile(value) {
+            console.log(value);
+        }
+
+        function viewFile(value) {
+            console.log(value);
+        }
+
+        async function postData(url, data) {
+            const response = await fetch(url, data);
+            return response;
+        }
 
 
-    </div>
+    </script>
+
+
+</div>
 
 {% endblock %}

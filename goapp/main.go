@@ -147,6 +147,8 @@ func listWorkFilesHandler() http.HandlerFunc {
 	})
 }
 
+// https://stackoverflow.com/questions/50740902/move-a-file-to-a-different-drive-with-go
+// https://golangbyexample.com/move-file-from-one-location-to-another-golang/
 // 5. Handle file deletion (move from /tmp to /bin)
 func deleteFileHandler() http.HandlerFunc {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
