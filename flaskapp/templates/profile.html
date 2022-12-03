@@ -1,9 +1,25 @@
 {% extends "layout.html" %}
 {% block content %}
-<div class="container">
-<h1>Profile Page</h1>
-<p><strong>username : </strong>{{ current_user.username }}</p>
-<p><strong>container id : </strong>{{ current_user.container_id }}</p>
-</div>
+    <div class="container">
+        <h1>Profile Page</h1>
+        <p><strong>username : </strong>{{ current_user.username }}</p>
+        <p><strong>container id : </strong>{{ current_user.container_id }}</p>
+        <p><strong>storage used : </strong><span id="storageUsed"></span></p>
+
+        <script>
+            const IP = "{{docker_ip}}";
+            const PORT = "{{docker_port}}";
+            const url = "http://" + IP + ":" + PORT + "/size";
+            console.log(url);
+            storageUsed = document.getElementById("storageUsed");
+            fetch(url).then((response) => {
+                return response.json()
+            })
+                .then((data) => {
+                    console.log(data);
+                    storageUsed.innerHTML = Math.round(data["size"] / 1024) + " KB";
+                });
+        </script>
+    </div>
 
 {% endblock content %}

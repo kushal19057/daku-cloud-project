@@ -14,7 +14,8 @@ def home():
 @app.route("/profile")
 @login_required
 def profile():
-    return render_template("profile.html")
+    docker_ip, docker_port = get_docker_ip_port(current_user)
+    return render_template("profile.html", docker_ip=docker_ip, docker_port=docker_port)
 
 @app.route("/register", methods=['GET', 'POST'])
 def register():
