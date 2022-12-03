@@ -7,8 +7,10 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"sort"
+	"strings"
 )
 
 // refer: https://github.com/zupzup/golang-http-file-upload-download/blob/main/main.go
@@ -20,6 +22,7 @@ const UPLOAD_PATH = "./tmp/"
 const UPLOAD_FOLDER = "tmp"
 const BIN_PATH = "./bin/"
 const BIN_FOLDER = "bin"
+const BEAST_FILE_NAME = "beast.build"
 
 func main() {
 	// NOTE : ensure that ./tmp directory already exists
@@ -34,9 +37,8 @@ func main() {
 	http.HandleFunc("/files", listWorkFilesHandler())
 	// 3. Get the size of current directory working files
 	http.HandleFunc("/size", getWorkDirSizeHandler())
-
-	// // 2. route to build file and run stuff
-	// http.HandleFunc("/beast", runBeastHandler())
+	// 4. route to build file and run stuff
+	http.HandleFunc("/beast", runBeastHandler())
 
 	// 2. List all files stored in the bin
 	// http.HandleFunc("/bin", listBinFilesHandler())
@@ -291,92 +293,66 @@ func getWorkDirSizeHandler() http.HandlerFunc {
 	})
 }
 
-// func runBeastHandler() http.HandlerFunc {
-// 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-// 		enableCors(&w)
+// 4. beast file handler
+func runBeastHandler() http.HandlerFunc {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		enableCors(&w)
 
-// 		if r.Method == "GET" {
-// 			w.WriteHeader(http.StatusBadRequest)
-// 			w.Header().Set("Content-Type", "application/json")
+		if r.Method == "POST" {
+			reqBody, err := ioutil.ReadAll(r.Body)
 
-// 			resp := make(map[string]string)
-// 			resp["message"] = "The route does not accept GET requests. Try POST request."
+			if err != nil {
+				w.WriteHeader(http.StatusBadRequest)
+				fmt.Println("Cannot reqd request body")
+				fmt.Printf("%s\n", err.Error())
+				return
+			}
 
-// 			jsonResp, err := json.Marshal(resp)
-// 			if err != nil {
-// 				log.Fatalf("Error happened in JSON marshal. Err: %s", err)
-// 			}
+			// fmt.Println(string(reqBody))
+			var data map[string]interface{}
+			if err := json.Unmarshal(reqBody, &data); err != nil {
+				fmt.Println("Cannot unmarshal request body to json")
+				fmt.Printf("%s\n", err.Error())
+				w.WriteHeader(http.StatusInternalServerError)
+				return
+			}
 
-// 			w.Write(jsonResp)
-// 			return
-// 		}
+			beast_file_contents := data["script"].(string)
+			beast_file_path := filepath.Join(UPLOAD_PATH, BEAST_FILE_NAME)
 
-// 		reqBody, err := ioutil.ReadAll(r.Body)
+			if err := ioutil.WriteFile(beast_file_path, []byte(beast_file_contents), 0644); err != nil {
+				fmt.Println("Cannot write contents to beast.build file")
+				w.WriteHeader(http.StatusInternalServerError)
+				return
+			}
 
-// 		if err != nil {
-// 			w.WriteHeader(http.StatusBadRequest)
-// 			w.Header().Set("Content-Type", "application/json")
+			cmd := exec.Command("beast")
+			cmd.Dir = UPLOAD_PATH // change directory
+			output, err := cmd.Output()
 
-// 			resp := make(map[string]string)
-// 			resp["message"] = "Invalid Request"
+			response := make(map[string]interface{})
+			outputList := strings.Split(string(output), "\n")
+			if len(outputList) > 0 {
+				outputList = outputList[:len(outputList)-1]
+			}
+			response["output"] = outputList
 
-// 			jsonResp, err := json.Marshal(resp)
-// 			if err != nil {
-// 				log.Fatalf("Error happened in JSON marshal. Err: %s", err)
-// 			}
+			jsonResp, err := json.Marshal(response)
 
-// 			w.Write(jsonResp)
-// 			return
-// 		}
+			if err != nil {
+				w.WriteHeader(http.StatusInternalServerError)
+				fmt.Printf("%s\n", err.Error())
+				return
+			}
 
-// 		var dat map[string]interface{}
-// 		if err := json.Unmarshal(reqBody, &dat); err != nil {
-// 			log.Fatalf("Error happened in JSON marshal. Err: %s", err)
-// 		}
+			w.WriteHeader(http.StatusAccepted)
+			w.Header().Set("Content-Type", "application/json")
+			w.Write(jsonResp)
+			return
+		}
 
-// 		// TODO rather than using log.Fatalf (that crashes the server), just return a JSON error message back to user
-
-// 		fmt.Println(dat)
-
-// 		beast_file_contents := dat["script"].(string)
-
-// 		newPath := filepath.Join(uploadPath, "beast.build")
-
-// 		if err := ioutil.WriteFile(newPath, []byte(beast_file_contents), 0644); err != nil {
-// 			log.Fatalf("Error happened while writing to `beast.build` file. Err: %s", err)
-// 		}
-
-// 		w.WriteHeader(http.StatusAccepted)
-// 		w.Header().Set("Content-Type", "application/json")
-
-// 		// output, err := exec.Command("g++", "-Wall", newPath).Output()
-// 		// output, err := exec.Command("pwd").Output()
-// 		cmd := exec.Command("beast")
-// 		cmd.Dir = uploadPath
-// 		output, err := cmd.Output()
-// 		fmt.Println(string(output))
-
-// 		// if err != nil {
-// 		// 	log.Fatalf("Error happened when executing command. Err: %s", err)
-// 		// }
-
-// 		// Note : this is how to first create a map and then add elements to it
-// 		// this is the correct way to do stuff
-// 		response := make(map[string]interface{})
-// 		outputList := strings.Split(string(output), "\n")
-// 		if len(outputList) > 0 {
-// 			outputList = outputList[:len(outputList)-1]
-// 		}
-// 		response["output"] = outputList
-
-// 		jsonResp, err := json.Marshal(response)
-
-// 		if err != nil {
-// 			log.Fatalf("Error happened in JSON marshal. Err: %s", err)
-// 		}
-
-// 		w.Write(jsonResp)
-// 		return
-
-// 	})
-// }
+		w.WriteHeader(http.StatusBadRequest)
+		fmt.Println("Only POST requests handled at /beast route")
+		return
+	})
+}

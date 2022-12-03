@@ -83,3 +83,9 @@ def upload_file():
 def list_work_files():
     docker_ip, docker_port = get_docker_ip_port(current_user)
     return render_template("container_list_work_files.html", docker_ip=docker_ip, docker_port=docker_port)
+
+@app.route("/beast")
+@login_required
+def run_beast():
+    docker_ip, docker_port = get_docker_ip_port(current_user)
+    return render_template("container_run_beast.html", docker_ip=docker_ip, docker_port=docker_port)

@@ -1,8 +1,9 @@
-{% extends '../base.html' %} {% block content %}
+{% extends 'layout.html' %} 
+
+{% block content %}
 
 <div class="container">
     <pre><b>beast.build</b>; Refer <a href="https://github.com/GauravDawra/Beast">here</a> for more details.</pre>
-    <p>{{ docker_details }}</p>
 
     <div id="editorCode" class="editor__code"></div>
 
@@ -42,9 +43,10 @@
         consoleLogs.innerHTML = '';
     });
 
-    // hardcode external IP for now
-    let url = "http://192.168.192.148:" + "{{docker_port}}" + "/run_beast"
-    console.log(url)
+    const ip = "{{ docker_ip }}";
+    const port = "{{ docker_port }}";
+    const url = "http://" + ip + ":" + port + "/beast";
+    console.log(url);
     
     // Events
     executeCodeBtn.addEventListener('click', () => {
