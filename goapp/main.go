@@ -230,9 +230,9 @@ func downloadFileHandler() http.HandlerFunc {
 			// https://stackoverflow.com/a/12518877
 			if _, err := os.Stat(file_path); err == nil {
 				// path/to/whatever exists
-				w.WriteHeader(http.StatusAccepted)
 				http.ServeFile(w, r, file_path)
 				return
+
 			} else if errors.Is(err, os.ErrNotExist) {
 				// path/to/whatever does *not* exist
 				w.WriteHeader(http.StatusBadRequest)

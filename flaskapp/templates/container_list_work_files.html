@@ -98,22 +98,93 @@
 
             postData(url, data);
 
+            // this is done to reload the page, and thus refresh the list. Must be a better way to do this task.
             window.location.reload();
         }
 
-        function downloadFile(value) {
+        async function downloadFile(value) {
             console.log(value);
+            console.log(value);
+            const ip = "{{ docker_ip }}";
+            const port = "{{ docker_port }}";
+            const url = "http://" + ip + ":" + port + "/download";
+            console.log(url);
+
+            downloadFileData = {
+                "file": value
+            }
+
+            data = {
+                method: "POST",
+                body: JSON.stringify(downloadFileData),
+                headers: {
+                    "Accept": "application/octet-stream",
+                },
+            }
+
+            try {
+                const resp = await postData(url, data);
+                const blob = await resp.blob();
+                const newBlob = new Blob([blob]);
+
+                const blobUrl = window.URL.createObjectURL(newBlob);
+
+                const link = document.createElement('a');
+                link.href = blobUrl;
+                link.setAttribute('download', value);
+                document.body.appendChild(link);
+                link.click();
+                link.parentNode.removeChild(link);
+
+                // clean up Url
+                window.URL.revokeObjectURL(blobUrl);
+            }
+            catch (err) {
+                console.log(err);
+            }
         }
 
         function viewFile(value) {
             console.log(value);
+            // for the time being, view file does the same functionality as downloadFile
+            // downloadFile(value);
+            // console.log(value);
+            // console.log(value);
+            // const ip = "{{ docker_ip }}";
+            // const port = "{{ docker_port }}";
+            // const url = "http://" + ip + ":" + port + "/download";
+            // console.log(url);
+
+            // viewFileData = {
+            //     "file": value
+            // }
+
+            // data = {
+            //     method: "POST",
+            //     body: JSON.stringify(viewFileData),
+            //     headers: {
+            //         "Accept": "application/octet-stream",
+            //     },
+            // }
+
+            // try {
+            //     const resp = await postData(url, data);
+            //     const blob = await resp.blob();
+
+            //     const newBlob = new Blob([blob]);
+
+            //     const blobUrl = window.URL.createObjectURL(newBlob);
+            //     window.open(blobUrl);
+            // }
+            // catch (err) {
+            //     console.log(err);
+            // }
         }
 
         async function postData(url, data) {
             const response = await fetch(url, data);
             return response;
         }
-
 
     </script>
 
