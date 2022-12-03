@@ -1,0 +1,71 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+    <div class="container">
+        <p>Files stored on server ...</p>
+        <table id="fileTableList" class="table table-hover">
+            <thead>
+            <tr>
+                <th scope="col">#</th>
+                <th scope="col">File Name</th>
+                <th scope="col"></th>
+                <th scope="col"></th>
+                <th scope="col"></th>
+            </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+
+        <!-- https://stackoverflow.com/questions/18333427/how-to-insert-a-row-in-an-html-table-body-in-javascript#:~:text=insertRow(tableRef.,the%20end%20of%20the%20table. -->
+        <script type="text/javascript">
+            const IP = "{{docker_ip}}";
+            const PORT = "{{docker_port}}";
+            const url = "http://" + IP + ":" + PORT + "/files";
+
+            console.log(url);
+
+            const tBodyRef = document.getElementById('fileTableList').getElementsByTagName('tbody')[0];
+            fetch(url).then((response) => {
+                return response.json()
+            })
+                .then((data) => {
+                    console.log(data);
+                    console.log(data.files)
+                    const fileNames = data.files;
+                    fileNames.forEach(function (value, i) {
+                        console.log("%d: %s", i, value)
+                        var row = document.createElement('tr');
+
+                        var cell_idx = document.createElement('td');
+                        var cell_value = document.createElement('td');
+
+                        var cell_view = document.createElement('td');
+                        var cell_download = document.createElement('td');
+                        var cell_delete = document.createElement('td');
+
+
+                        cell_idx.innerHTML = i;
+                        cell_value.innerHTML = value;
+
+                        cell_view.innerHTML = "<button class='btn btn-primary btn-sm' onclick='' type='button'>view</button>";
+                        cell_delete.innerHTML = "<button class='btn btn-danger btn-sm' onclick='' type='button'>delete</button>";
+                        cell_download.innerHTML = "<button class='btn btn-secondary btn-sm' onclick='' type='button'>download</button>";
+
+                        row.appendChild(cell_idx);
+                        row.appendChild(cell_value);
+                        row.appendChild(cell_view)
+                        row.appendChild(cell_download);
+                        row.appendChild(cell_delete);
+
+                        tBodyRef.appendChild(row);
+                    });
+                }).catch(error => {
+                console.log("error happened")
+                console.dir(error)
+            });
+        </script>
+
+
+    </div>
+
+{% endblock %}

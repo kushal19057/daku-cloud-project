@@ -76,3 +76,9 @@ def logout():
 def upload_file():
     docker_ip, docker_port = get_docker_ip_port(current_user)
     return render_template("container_file_upload.html", docker_ip=docker_ip, docker_port=docker_port)
+
+@app.route("/files")
+@login_required
+def list_work_files():
+    docker_ip, docker_port = get_docker_ip_port(current_user)
+    return render_template("container_list_work_files.html", docker_ip=docker_ip, docker_port=docker_port)
