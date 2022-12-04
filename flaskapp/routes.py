@@ -89,3 +89,9 @@ def list_work_files():
 def run_beast():
     docker_ip, docker_port = get_docker_ip_port(current_user)
     return render_template("container_run_beast.html", docker_ip=docker_ip, docker_port=docker_port)
+
+@app.route("/bin_files")
+@login_required
+def list_bin_files():
+    docker_ip, docker_port=get_docker_ip_port(current_user)
+    return render_template("container_list_bin_files.html", docker_ip=docker_ip,  docker_port=docker_port)

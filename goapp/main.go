@@ -42,11 +42,18 @@ func main() {
 	http.HandleFunc("/beast", runBeastHandler())
 	// 5. Delete File
 	http.HandleFunc("/delete", deleteFileHandler())
+
+	// permanently Delete File
+	http.HandleFunc("/permanent_delete", permanentDeleteFileHandler())
+
+	// restore deleted File
+	http.HandleFunc("/restore", restoreFileHandler())
+
 	// 6. Download File
 	http.HandleFunc("/download", downloadFileHandler())
 
 	// 2. List all files stored in the bin
-	// http.HandleFunc("/bin", listBinFilesHandler())
+	http.HandleFunc("/bin_files", listBinFilesHandler())
 
 	//
 
@@ -149,6 +156,45 @@ func listWorkFilesHandler() http.HandlerFunc {
 	})
 }
 
+func listBinFilesHandler() http.HandlerFunc {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		enableCors(&w)
+
+		if r.Method == "GET" {
+			files, err := ioutil.ReadDir(BIN_PATH)
+			if err != nil {
+				w.WriteHeader(http.StatusInternalServerError)
+				fmt.Println("Error walking thru file directory")
+				return
+			}
+
+			file_names := []string{}
+
+			for _, f := range files {
+				file_names = append(file_names, f.Name())
+			}
+
+			// sort alphabetically
+			sort.Strings(file_names)
+
+			// reply back to client with files
+			w.WriteHeader(http.StatusAccepted)
+			w.Header().Set("Content-Type", "application/json")
+
+			resp := make(map[string]interface{})
+			resp["files"] = file_names
+
+			json_resp, _ := json.Marshal(resp)
+			w.Write(json_resp)
+			return
+		}
+
+		// handle non GET requests
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	})
+}
+
 // https://stackoverflow.com/questions/50740902/move-a-file-to-a-different-drive-with-go
 // https://golangbyexample.com/move-file-from-one-location-to-another-golang/
 // 5. Handle file deletion (move from /tmp to /bin)
@@ -198,6 +244,99 @@ func deleteFileHandler() http.HandlerFunc {
 
 		w.WriteHeader(http.StatusBadRequest)
 		fmt.Println("Only POST requests accepted on the /delete route")
+		return
+	})
+}
+
+func restoreFileHandler() http.HandlerFunc {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		enableCors(&w)
+
+		if r.Method == "POST" {
+			reqBody, err := ioutil.ReadAll(r.Body)
+
+			if err != nil {
+				w.WriteHeader(http.StatusBadRequest)
+				fmt.Println("Cannot reqd request body")
+				fmt.Printf("%s\n", err.Error())
+				return
+			}
+
+			var data map[string]interface{}
+			if err := json.Unmarshal(reqBody, &data); err != nil {
+				fmt.Println("Cannot unmarshal request body to json")
+				fmt.Printf("%s\n", err.Error())
+				w.WriteHeader(http.StatusInternalServerError)
+				return
+			}
+
+			file_name := data["file"].(string)
+			file_path := filepath.Join(BIN_PATH, file_name)
+			bin_file_path := filepath.Join(UPLOAD_PATH, file_name)
+
+			err = os.Chmod(file_path, 0777)
+			if err != nil {
+				fmt.Println(err.Error())
+				w.WriteHeader(http.StatusInternalServerError)
+				return
+			}
+
+			err = os.Rename(file_path, bin_file_path)
+			if err != nil {
+				fmt.Println(err.Error())
+				w.WriteHeader(http.StatusInternalServerError)
+				return
+			}
+
+			w.WriteHeader(http.StatusAccepted)
+			return
+		}
+
+		w.WriteHeader(http.StatusBadRequest)
+		fmt.Println("Only POST requests accepted on the /delete route")
+		return
+	})
+}
+
+func permanentDeleteFileHandler() http.HandlerFunc {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		enableCors(&w)
+
+		if r.Method == "POST" {
+			reqBody, err := ioutil.ReadAll(r.Body)
+
+			if err != nil {
+				w.WriteHeader(http.StatusBadRequest)
+				fmt.Println("Cannot reqd request body")
+				fmt.Printf("%s\n", err.Error())
+				return
+			}
+
+			var data map[string]interface{}
+			if err := json.Unmarshal(reqBody, &data); err != nil {
+				fmt.Println("Cannot unmarshal request body to json")
+				fmt.Printf("%s\n", err.Error())
+				w.WriteHeader(http.StatusInternalServerError)
+				return
+			}
+
+			file_name := data["file"].(string)
+			file_path := filepath.Join(BIN_PATH, file_name)
+			// bin_file_path := filepath.Join(BIN_PATH, file_name)
+
+			err = os.Remove(file_path)
+			if err != nil {
+				fmt.Println(err.Error())
+				w.WriteHeader(http.StatusInternalServerError)
+				return
+			}
+
+			w.WriteHeader(http.StatusAccepted)
+			return
+		}
+
+		w.WriteHeader(http.StatusBadRequest)
+		fmt.Println("Only POST requests accepted on the /permanent_delete route")
 		return
 	})
 }

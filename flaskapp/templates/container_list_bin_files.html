@@ -1,0 +1,141 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+    <div class="container">
+        <p>Files present in the bin ...</p>
+        <table id="fileTableList" class="table table-hover">
+            <thead>
+            <tr>
+                <th scope="col">#</th>
+                <th scope="col">File Name</th>
+                <th scope="col"></th>
+                <th scope="col"></th>
+                <th scope="col"></th>
+            </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+
+        <!-- https://stackoverflow.com/questions/18333427/how-to-insert-a-row-in-an-html-table-body-in-javascript#:~:text=insertRow(tableRef.,the%20end%20of%20the%20table. -->
+        <script type="text/javascript">
+            const IP = "{{docker_ip}}";
+            const PORT = "{{docker_port}}";
+            const url = "http://" + IP + ":" + PORT + "/bin_files";
+
+            console.log(url);
+
+            const tBodyRef = document.getElementById('fileTableList').getElementsByTagName('tbody')[0];
+
+            fetch(url).then((response) => {
+                return response.json()
+            })
+                .then((data) => {
+                    console.log(data);
+                    console.log(data.files)
+                    const fileNames = data.files;
+                    fileNames.forEach(function (value, i) {
+                        console.log("%d: %s", i, value)
+                        let row = document.createElement('tr');
+
+                        let cell_idx = document.createElement('td');
+                        let cell_value = document.createElement('td');
+
+                        let cell_view = document.createElement('td');
+                        let cell_restore = document.createElement('td');
+                        let cell_delete = document.createElement('td');
+
+
+                        cell_idx.innerHTML = i;
+                        cell_value.innerHTML = value;
+
+                        cell_view.innerHTML = "<button class='btn btn-primary btn-sm' type='button'>view</button>";
+                        cell_delete.innerHTML = `<button class='btn btn-danger btn-sm' type='button'>delete</button>`;
+                        cell_restore.innerHTML = "<button class='btn btn-secondary btn-sm' type='button'>restore</button>";
+                        
+                        // https://stackoverflow.com/questions/9643311/pass-a-string-parameter-in-an-onclick-function
+
+                        cell_delete.addEventListener('click', function() {
+                            deleteFile(value);
+                        });
+
+                        cell_view.addEventListener('click', function() {
+                            viewFile(value);
+                        });
+
+                        cell_restore.addEventListener("click", function(){
+                            restoreFile(value);
+                        });
+
+                        row.appendChild(cell_idx);
+                        row.appendChild(cell_value);
+                        row.appendChild(cell_view)
+                        row.appendChild(cell_restore);
+                        row.appendChild(cell_delete);
+
+                        tBodyRef.appendChild(row);
+                    });
+                }).catch(error => {
+                console.log("error happened")
+                console.dir(error)
+            });
+
+
+            function deleteFile(value) {
+            console.log(value);
+            const ip = "{{ docker_ip }}";
+            const port = "{{ docker_port }}";
+            const url = "http://" + ip + ":" + port + "/permanent_delete";
+            console.log(url);
+
+            deleteFileData = {
+                "file": value
+            }
+
+            data = {
+                method: "POST",
+                body: JSON.stringify(deleteFileData)
+            }
+
+            postData(url, data);
+
+            // this is done to reload the page, and thus refresh the list. Must be a better way to do this task.
+            window.location.reload();
+        }
+
+            function restoreFile(value) {
+                console.log(value);
+            const ip = "{{ docker_ip }}";
+            const port = "{{ docker_port }}";
+            const url = "http://" + ip + ":" + port + "/restore";
+            console.log(url);
+
+            restoreFileData = {
+                "file": value
+            }
+
+            data = {
+                method: "POST",
+                body: JSON.stringify(restoreFileData)
+            }
+
+            postData(url, data);
+
+            // this is done to reload the page, and thus refresh the list. Must be a better way to do this task.
+            window.location.reload();
+            }
+
+            function viewFile(value) {
+                console.log(value);
+            }
+
+            async function postData(url, data) {
+            const response = await fetch(url, data);
+            return response;
+        }
+
+        </script>
+
+
+    </div>
+
+{% endblock %}
