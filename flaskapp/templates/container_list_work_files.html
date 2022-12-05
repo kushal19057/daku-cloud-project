@@ -40,7 +40,7 @@
                     let cell_idx = document.createElement('td');
                     let cell_value = document.createElement('td');
 
-                    let cell_view = document.createElement('td');
+                    // let cell_view = document.createElement('td');
                     let cell_download = document.createElement('td');
                     let cell_delete = document.createElement('td');
 
@@ -48,7 +48,7 @@
                     cell_idx.innerHTML = i;
                     cell_value.innerHTML = value;
 
-                    cell_view.innerHTML = "<button class='btn btn-primary btn-sm' type='button'>view</button>";
+                    // cell_view.innerHTML = "<button class='btn btn-primary btn-sm' type='button'>view</button>";
                     cell_delete.innerHTML = `<button class='btn btn-danger btn-sm' type='button'>delete</button>`;
                     cell_download.innerHTML = "<button class='btn btn-secondary btn-sm' type='button'>download</button>";
 
@@ -58,9 +58,9 @@
                         deleteFile(value);
                     });
 
-                    cell_view.addEventListener('click', function () {
-                        viewFile(value);
-                    });
+                    // cell_view.addEventListener('click', function () {
+                    //     viewFile(value);
+                    // });
 
                     cell_download.addEventListener('click', function () {
                         downloadFile(value);
@@ -68,7 +68,7 @@
 
                     row.appendChild(cell_idx);
                     row.appendChild(cell_value);
-                    row.appendChild(cell_view)
+                    // row.appendChild(cell_view)
                     row.appendChild(cell_download);
                     row.appendChild(cell_delete);
 
@@ -144,8 +144,8 @@
             }
         }
 
-        function viewFile(value) {
-            console.log(value);
+        // function viewFile(value) {
+            // console.log(value);
             // for the time being, view file does the same functionality as downloadFile
             // downloadFile(value);
             // console.log(value);
@@ -179,7 +179,7 @@
             // catch (err) {
             //     console.log(err);
             // }
-        }
+        // }
 
         async function postData(url, data) {
             const response = await fetch(url, data);

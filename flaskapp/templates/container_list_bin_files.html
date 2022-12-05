@@ -40,7 +40,7 @@
                         let cell_idx = document.createElement('td');
                         let cell_value = document.createElement('td');
 
-                        let cell_view = document.createElement('td');
+                        // let cell_view = document.createElement('td');
                         let cell_restore = document.createElement('td');
                         let cell_delete = document.createElement('td');
 
@@ -48,8 +48,8 @@
                         cell_idx.innerHTML = i;
                         cell_value.innerHTML = value;
 
-                        cell_view.innerHTML = "<button class='btn btn-primary btn-sm' type='button'>view</button>";
-                        cell_delete.innerHTML = `<button class='btn btn-danger btn-sm' type='button'>delete</button>`;
+                        // cell_view.innerHTML = "<button class='btn btn-primary btn-sm' type='button'>view</button>";
+                        cell_delete.innerHTML = `<button class='btn btn-danger btn-sm' type='button'>permanent delete</button>`;
                         cell_restore.innerHTML = "<button class='btn btn-secondary btn-sm' type='button'>restore</button>";
                         
                         // https://stackoverflow.com/questions/9643311/pass-a-string-parameter-in-an-onclick-function
@@ -58,9 +58,9 @@
                             deleteFile(value);
                         });
 
-                        cell_view.addEventListener('click', function() {
-                            viewFile(value);
-                        });
+                        // cell_view.addEventListener('click', function() {
+                        //     viewFile(value);
+                        // });
 
                         cell_restore.addEventListener("click", function(){
                             restoreFile(value);
@@ -68,7 +68,7 @@
 
                         row.appendChild(cell_idx);
                         row.appendChild(cell_value);
-                        row.appendChild(cell_view)
+                        // row.appendChild(cell_view)
                         row.appendChild(cell_restore);
                         row.appendChild(cell_delete);
 
@@ -124,9 +124,9 @@
             window.location.reload();
             }
 
-            function viewFile(value) {
-                console.log(value);
-            }
+            // function viewFile(value) {
+            //     console.log(value);
+            // }
 
             async function postData(url, data) {
             const response = await fetch(url, data);
