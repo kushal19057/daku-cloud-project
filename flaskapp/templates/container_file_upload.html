@@ -2,43 +2,51 @@
 
 {% block content %}
 
+
+<script type="text/javascript">
+    async function postData(url, data) {
+        const response = await fetch(url, data);
+        console.log(data)
+        console.log(response)
+        return response;
+    }
+
+    uploadFile = async () => {
+        document.getElementById("upload-logs").innerHTML = "started uploading..."
+        console.log(document.getElementById("upload-logs").innerHTML);
+        const fileupload = document.getElementById("fileupload");
+        let formData = new FormData();
+        formData.append("upload_file", fileupload.files[0]);
+
+        const data = {
+            method: "POST",
+            body: formData
+        };
+
+        const IP = "{{docker_ip}}";
+        const PORT = "{{docker_port}}";
+
+        console.log(IP, PORT)
+
+        const url = "http://" + IP + ":" + PORT + "/upload";
+        console.log(url);
+
+        const resp = await postData(url, data);
+        console.log(resp)
+        document.getElementById("upload-logs").innerHTML = `uploading finished...; view the uploaded files at <strong style="font-family:monospace;">My Files</strong>`
+        console.log(document.getElementById("upload-logs").innerHTML);
+    }
+
+</script>
+
+
 <div class="container">
-    <script type="text/javascript">
-        async function postData(url, data) {
-            const response = await fetch(url, data);
-            console.log(data)
-            console.log(response)
-            return response;
-        }
-
-        uploadFile = async () => {
-            const fileupload = document.getElementById("fileupload");
-            let formData = new FormData();
-            formData.append("upload_file", fileupload.files[0]);
-
-            const data = {
-                method: "POST",
-                body: formData
-            };
-
-            const  IP = "{{docker_ip}}";
-            const PORT = "{{docker_port}}";
-
-            console.log(IP, PORT)
-
-            const url = "http://" + IP + ":" + PORT + "/upload";
-            console.log(url);
-
-            const resp = await postData(url, data)
-            console.log(resp)
-        }
-
-    </script>
-
-    <p>Pick a file from your file directory to upload to the server ... </p>                          
-    <input  id="fileupload" type="file"/>
-    <button onclick="uploadFile()" class='btn btn-primary btn-sm'>Upload File</button>
-
+    <div class="text-center">
+        <input class="form-control form-control-lg mt-5 mb-5" id="fileupload" type="file">
+        <button type="submit" onclick="uploadFile()" class="btn btn-primary">Upload File</button>
+    </div>
+    <hr>
+    <p class="text-muted" id="upload-logs"></p>
 </div>
 
 {% endblock %}
