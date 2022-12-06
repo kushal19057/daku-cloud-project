@@ -7,6 +7,8 @@ app = Flask(__name__)
 
 app.config["SECRET_KEY"] = '1f1e1210f56638c8d6536435c6f19b5a'
 app.config["SQLALCHEMY_DATABASE_URI"] = 'sqlite:///site.db'
+# app.config["SQLALCHEMY_DATABASE_URI"] = f"postgresql://{username}:{password}@localhost:5432/{database}"
+
 
 db = SQLAlchemy(app)
 bcrypt = Bcrypt(app)
