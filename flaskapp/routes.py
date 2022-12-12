@@ -4,7 +4,7 @@ from flaskapp.forms import RegistrationForm, LoginForm
 from flaskapp.models import User
 from flask_login import login_user, current_user, logout_user, login_required
 import docker
-from flaskapp.functions import get_docker_ip_port, get_container_ip
+from flaskapp.functions import get_docker_ip_port, get_container_ip, get_backup_container_ip
 
 @app.route("/")
 @app.route("/home")
@@ -37,8 +37,17 @@ def register():
         container.reload()
         port = container.ports['8080/tcp'][0]['HostPort']
 
+
+        # create backup container
+        ip_back_up = get_backup_container_ip(ip)
+        url_back_up = ip_back_up + ":2375"
+        client_back_up = docker.DockerClient(base_url=url_back_up)
+        container_back_up = client_back_up.containers.run("kushal19057/my-go-app", ports={8080:None}, detach=True)
+        container_back_up.reload()
+        port_back_up = container_back_up.ports['8080/tcp'][0]['HostPort']
+
         # create user instance
-        user = User(email=form.email.data, password=hashed_password, container_id=container.id, ip_address=ip, port_number=port)
+        user = User(email=form.email.data, password=hashed_password, container_id=container.id, ip_address=ip, port_number=port, port_backup_number=port_back_up, ip_backup_address=ip_back_up)
         db.session.add(user)
 
         db.session.commit()

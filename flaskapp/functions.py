@@ -33,3 +33,17 @@ def get_container_ip()->str:
 
     print(list(dict_load.keys())[0])
     return str(list(dict_load.keys())[0])
+
+def get_backup_container_ip(original_ip)->str:
+    with open("./flaskapp/ip.json", "r") as f:
+        file = json.load(f)
+
+    ips = file["server_ips"]
+
+    if len(ips)==1:
+        return original_ip
+
+    for ip in ips:
+
+        if ip!=original_ip:
+            return ip
