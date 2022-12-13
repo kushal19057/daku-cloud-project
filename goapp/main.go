@@ -55,7 +55,8 @@ func main() {
 	// 2. List all files stored in the bin
 	http.HandleFunc("/bin_files", listBinFilesHandler())
 
-	//
+	// heartbeat check
+	http.HandleFunc("/heartbeat", heartbeatCheck())
 
 	log.Fatal(http.ListenAndServe(":8080", nil))
 }
@@ -496,6 +497,35 @@ func runBeastHandler() http.HandlerFunc {
 
 		w.WriteHeader(http.StatusBadRequest)
 		fmt.Println("Only POST requests handled at /beast route")
+		return
+	})
+}
+
+// heartbeat check
+func heartbeatCheck() http.HandlerFunc {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		enableCors(&w)
+
+		if r.Method == "GET" {
+			response := make(map[string]interface{})
+			response["output"] = "hey, i am alive"
+
+			jsonResp, err := json.Marshal(response)
+
+			if err != nil {
+				w.WriteHeader(http.StatusInternalServerError)
+				fmt.Printf("%s\n", err.Error())
+				return
+			}
+
+			w.WriteHeader(http.StatusAccepted)
+			w.Header().Set("Content-Type", "application/json")
+			w.Write(jsonResp)
+			return
+		}
+
+		w.WriteHeader(http.StatusBadRequest)
+		fmt.Println("Only GET requests accepted on the /heartbeat route")
 		return
 	})
 }
