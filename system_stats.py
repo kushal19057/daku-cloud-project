@@ -10,7 +10,7 @@ IP = '' # change this to the IP of the server on which it is deployed
 r = redis.Redis(host='redis-18253.c264.ap-south-1-1.ec2.cloud.redislabs.com', port=18253, db=0, password='oc01To5gRD86hOcEoBD4RMFdpLvk8Ikz')
 
 next_time = datetime.datetime.now()
-delta = datetime.timedelta(seconds=10)
+delta = datetime.timedelta(seconds=2)
 
 while True:
     period = datetime.datetime.now()

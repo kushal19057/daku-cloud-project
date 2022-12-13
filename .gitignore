@@ -168,3 +168,5 @@ go_app/tmp/
 # goapp files when testing code
 goapp/tmp/
 goapp/bin/
+
+*.tar

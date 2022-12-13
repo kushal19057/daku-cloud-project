@@ -4,7 +4,7 @@ from flaskapp.forms import RegistrationForm, LoginForm
 from flaskapp.models import User
 from flask_login import login_user, current_user, logout_user, login_required
 import docker
-from flaskapp.functions import get_docker_ip_port, get_container_ip, get_backup_container_ip
+from flaskapp.functions import get_docker_ip_port, get_container_ip
 
 @app.route("/")
 @app.route("/home")

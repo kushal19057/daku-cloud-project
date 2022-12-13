@@ -12,10 +12,7 @@ class User(db.Model, UserMixin):
     container_id = db.Column(db.String(120), nullable=False)
     ip_address = db.Column(db.String(30), nullable=False)
     port_number = db.Column(db.Integer, nullable=False)
-    ip_backup_address = db.Column(db.String(30), nullable=False)
-    port_backup_number = db.Column(db.Integer, nullable=False)
     
-
     def __repr__(self):
         return f"User('{self.email}, {self.container_id}, {self.ip_address}, {self.port_number}')"
 
