@@ -27,7 +27,7 @@ public class DakuProjectWorkflow {
 
     @BeforeTest()
     public void setUp() throws Exception {
-        String my_driver_path = "C:/Users/udit1/Downloads/chromeDriver/chromedriver.exe";
+        String my_driver_path = "/home/kushalj/Documents/daku-cloud-project/daku_automation/chromedriver";
         System.setProperty("webdriver.chrome.driver", my_driver_path);
 
 
@@ -57,7 +57,7 @@ public class DakuProjectWorkflow {
         for(int i=0;i<n;i++)
         {
 //            System.out.println(i);
-            emails.add("email_1_"+Integer.toString(i)+"@gmail.com");
+            emails.add("email_conf3_"+Integer.toString(i)+"@gmail.com");
             passwords.add("password"+Integer.toString(i));
         }
 
@@ -119,14 +119,14 @@ public class DakuProjectWorkflow {
 
             Thread.sleep(1000);
 //        driver.findElement(By.id("fileupload")).clear();
-            driver.findElement(By.id("fileupload")).sendKeys("C:/Users/udit1/Desktop/image.png");
+            driver.findElement(By.id("fileupload")).sendKeys("/home/kushalj/Downloads/file1.jpg");
 
 
             driver.findElement(By.xpath("//button[@onclick='uploadFile()']")).click();
             // Label: view_file
             Thread.sleep(5000);
 
-            driver.findElement(By.id("fileupload")).sendKeys("C:\\Users\\udit1\\Downloads\\main.c");
+            driver.findElement(By.id("fileupload")).sendKeys("/home/kushalj/Downloads/file2.mp3");
 
             driver.findElement(By.xpath("//button[@onclick='uploadFile()']")).click();
             // Label: view_file

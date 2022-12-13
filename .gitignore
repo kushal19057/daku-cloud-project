@@ -170,3 +170,4 @@ goapp/tmp/
 goapp/bin/
 
 *.tar
+chromedriver
